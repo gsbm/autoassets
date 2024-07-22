@@ -1,7 +1,7 @@
 ---
 title: Autoassets
 emoji: ⚪⬜
-colorFrom: gray
+colorFrom: indigo
 colorTo: black
 sdk: static
 pinned: false
