@@ -1,8 +1,8 @@
 ---
 title: Autoassets
-emoji: 🚀
+emoji: ⚪⬜
 colorFrom: gray
-colorTo: red
+colorTo: black
 sdk: static
 pinned: false
 license: gpl-3.0
