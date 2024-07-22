@@ -456,7 +456,8 @@ form_object.addEventListener('submit', async (event) => {
         const num_inference_steps_refiner = parseInt(data.num_inference_steps_refiner);
         const apply_refiner = data.apply_refiner || false;
         const api_key = data.hf_api_key;
-        const model = data.image_sampler;
+        const model_image_sampler = data.image_sampler;
+        const model_mesh_builder = data.mesh_builder;
 
         // Prompt type text: generate image
         if (prompt_type === "type-text") {
@@ -478,7 +479,7 @@ form_object.addEventListener('submit', async (event) => {
                 num_inference_steps_base,
                 num_inference_steps_refiner,
                 apply_refiner,
-                model
+                model_image_sampler
             );
             // console.log("Generated Image URL:", image_url);
         } else
@@ -491,7 +492,7 @@ form_object.addEventListener('submit', async (event) => {
             } catch (error){
                 if (error instanceof TypeError) {
                     resetPromptImage();
-                    throw new Error("Please select a valid image file.");
+                    throw new Error("Please select a valid image file");
                 }
             }
         }
@@ -509,7 +510,8 @@ form_object.addEventListener('submit', async (event) => {
             api_key,
             image_url,
             sample_steps,
-            seed_value
+            seed_value,
+            model_mesh_builder
         );
         // console.log("Generated Mesh:", mesh_url);
 
@@ -591,8 +593,9 @@ getSpacesAvailability().then((spaces_availability) => {
     for (const space of spaces_availability) {
 
         const space_label = space.label;
-        const space_api = space.api;
         const space_url = space.url;
+        const space_type = space.type;
+        const space_key = space.key;
         const space_runtime = space.runtime;
 
         const status_item = document.createElement('div');
@@ -607,6 +610,7 @@ getSpacesAvailability().then((spaces_availability) => {
         const status_item_state = document.createElement('span');
         status_item_state.classList.add('status-item-state');
 
+        status_item_state.textContent = space_runtime.replace(/_/g, ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         if (space_runtime === "RUNNING") {
             status_label.classList.remove('error');
             status_label.classList.add('success');
@@ -618,8 +622,6 @@ getSpacesAvailability().then((spaces_availability) => {
             status_item_state.classList.add('error');
         }
 
-        status_item_state.textContent = space_runtime.replace(/_/g, ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-
         if (status_item_state.classList.contains('success')) {
             const status_item_state_icon = document.createElement('span');
             status_item_state_icon.classList.add('mdi', 'mdi-fan', 'icon');
@@ -628,6 +630,13 @@ getSpacesAvailability().then((spaces_availability) => {
         status_item.appendChild(status_item_state);
         
         status_content.appendChild(status_item);
+
+
+        const select = document.getElementById(space_type);
+        const option = document.createElement('option');
+        option.value = space_key;
+        option.textContent = space_label;
+        select.appendChild(option);
     }
 
     label.textContent = i + '/' + spaces_availability.length;

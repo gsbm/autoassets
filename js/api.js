@@ -6,20 +6,23 @@ import { listSpaces } from "@huggingface/hub";
 Spaces configuration
 ****************************************************************************************/
 const spaces = {
-    sdxl: {
-        label: "Stable Diffusion XL",
-        api: "hysts/SDXL",
-        url: "https://huggingface.co/spaces/hysts/SDXL"
-    },
     sd3m: {
         label: "Stable Diffusion 3 Medium",
         api: "stabilityai/stable-diffusion-3-medium",
-        url: "https://huggingface.co/spaces/stabilityai/stable-diffusion-3-medium"
+        url: "https://huggingface.co/spaces/stabilityai/stable-diffusion-3-medium",
+        type: "image_sampler"
+    },
+    sdxl: {
+        label: "Stable Diffusion XL",
+        api: "hysts/SDXL",
+        url: "https://huggingface.co/spaces/hysts/SDXL",
+        type: "image_sampler"
     },
     instantmesh: {
         label: "InstantMesh",
         api: "TencentARC/InstantMesh",
-        url: "https://huggingface.co/spaces/TencentARC/InstantMesh"
+        url: "https://huggingface.co/spaces/TencentARC/InstantMesh",
+        type: "mesh_builder"
     }
 }
 
@@ -70,6 +73,8 @@ export async function getSpacesAvailability() {
             label: space_id.label,
             api: space_id.api,
             url: space_id.url,
+            type: space_id.type,
+            key: Object.keys(spaces).find(key => spaces[key] === space_id),
             runtime: runtime.stage
         });
     }
@@ -103,8 +108,11 @@ export async function generateImage(
     });
 
     if (model === "sdxl") {
-        // Generate image from SDXL space
-        var generation_job = client.submit("/run", {
+        /******************************************
+        Job: sdxl
+        ******************************************/
+        // Generate image
+        const generation_job = client.submit("/run", {
             prompt: prompt,
             negative_prompt: negative_prompt,
             prompt_2: "",
@@ -121,9 +129,25 @@ export async function generateImage(
             num_inference_steps_refiner: num_inference_steps_refiner,
             apply_refiner: apply_refiner,
         });
+        for await (const message of generation_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+    
+            }
+            if (message.type === "data") {
+                const {
+                    data: [result]
+                } = message;
+            
+                return result.url;
+            }
+        }
     } else if (model === "sd3m") {
-        // Generate image from SD3M space
-        var generation_job = client.submit("/infer", {
+        /******************************************
+        Job: sd3m
+        ******************************************/
+        // Generate image
+        const generation_job = client.submit("/infer", {
             prompt: prompt,
             negative_prompt: negative_prompt,
             seed: seed,
@@ -133,22 +157,22 @@ export async function generateImage(
             guidance_scale: guidance_scale_base,
             num_inference_steps: num_inference_steps_base,
         });
-    }
-
-    for await (const message of generation_job) {
-        if (message.type === "status") {
-            streamStatus(message);
-
+        for await (const message of generation_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+    
+            }
+            if (message.type === "data") {
+                const {
+                    data: [result]
+                } = message;
+            
+                return result.url;
+            }
         }
-        if (message.type === "data") {
-            const {
-                data: [result]
-            } = message;
-        
-            return result.url;
-        }
+    } else {
+        throw new Error("Unknown or unsupported model");
     }
-
 }
 
 
@@ -159,10 +183,11 @@ export async function generateMesh(
     api_key,
     image_url,
     sample_steps,
-    seed
+    seed,
+    model
 ) {
-    // Connect to InstantMesh space
-    const client = await Client.connect(spaces.instantmesh.api, {
+    // Connect to space
+    const client = await Client.connect(spaces[model].api, {
         hf_token: api_key,
         events: ["status", "data"]
     });
@@ -170,55 +195,62 @@ export async function generateMesh(
     // Fetch image
     const image = await fetch(image_url);
     if (!image.ok) {
-        throw new Error("Failed to fetch the generated image");
+        throw new Error("Failed to fetch the reference image");
     }
 
     // Convert image to blob
     const image_blob = await image.blob();
 
-    // Preprocess image
-    const preprocess_job = client.submit("/preprocess", [
-        handle_file(image_blob),
-        true
-    ]);
-    for await (const message of preprocess_job) {
-        if (message.type === "status") {
-            streamStatus(message);
+    if (model === "instantmesh") {
+        /******************************************
+        Job: instantmesh
+        ******************************************/
+        // Preprocess image
+        const preprocess_job = client.submit("/preprocess", [
+            handle_file(image_blob),
+            true
+        ]);
+        for await (const message of preprocess_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
+            if (message.type === "data") {
+                var result_processed_image = message;        
+            }
         }
-        if (message.type === "data") {
-            var result_processed_image = message;        
-        }
-    }
 
-    // Fetch processed image
-    const processed_image = await fetch(result_processed_image.data[0].url);
-    if (!processed_image.ok) {
-        throw new Error("Failed to fetch the processed image");
-    }
-
-    // Convert processed image to blob
-    const processed_image_blob = await processed_image.blob();
-
-    // Generate MVS
-    const generation_job = client.submit("/generate_mvs", [
-        handle_file(processed_image_blob),
-        sample_steps,
-        seed,
-    ]);
-    for await (const message of generation_job) {
-        if (message.type === "status") {
-            streamStatus(message);
+        // Fetch processed image
+        const processed_image = await fetch(result_processed_image.data[0].url);
+        if (!processed_image.ok) {
+            throw new Error("Failed to fetch the processed image");
         }
-    }
 
-    // Extrude mesh
-    const extrusion_job = client.submit("/make3d", []);
-    for await (const message of extrusion_job) {
-        if (message.type === "status") {
-            streamStatus(message);
+        // Convert processed image to blob
+        const processed_image_blob = await processed_image.blob();
+
+        // Generate MVS
+        const generation_job = client.submit("/generate_mvs", [
+            handle_file(processed_image_blob),
+            sample_steps,
+            seed,
+        ]);
+        for await (const message of generation_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
         }
-        if (message.type === "data") {
-            return message.data[1].url;
+
+        // Extrude mesh
+        const extrusion_job = client.submit("/make3d", []);
+        for await (const message of extrusion_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
+            if (message.type === "data") {
+                return message.data[1].url;
+            }
         }
+    } else {
+        throw new Error("Unknown or unsupported model");
     }
 }
