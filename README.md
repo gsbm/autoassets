@@ -2,7 +2,7 @@
 title: Autoassets
 emoji: ⚪⬜
 colorFrom: indigo
-colorTo: black
+colorTo: gray
 sdk: static
 pinned: false
 license: gpl-3.0
