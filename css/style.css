@@ -210,7 +210,7 @@ textarea,
 button,
 select,
 input[type="file"] + label {
-    line-height: 1.2em;
+    line-height: 1.2em !important;
     box-sizing: border-box;
     font-size: 14px;
     padding: 10px 14px;
@@ -226,6 +226,7 @@ select:focus,
 div:focus,
 input[type="file"] + label:focus {
     outline: 2px solid var(--color-foreground-025);
+    border-color: var(--color-foreground-025);
 }
 
 input:disabled,
@@ -263,10 +264,6 @@ input[type="file"] {
     border-radius: 0;
     outline: 0;
     border: 0;
-}
-
-input[type="file"]:focus + label {
-    outline: 2px solid var(--color-foreground-025);
 }
 
 input[type="file"] + label {
