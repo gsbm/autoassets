@@ -191,22 +191,6 @@ if ('ontouchstart' in document.documentElement) {
 }
 
 // Presets
-// const form_preset_items = document.querySelectorAll('.preset-item');
-// function refreshPresets() {
-//     const list = [...preset_list];
-//     form_preset_items.forEach(item => {
-//         let i = Math.floor(Math.random() * list.length);
-//         item.textContent = list[i];
-//         list.splice(i, 1);
-//     });
-// }
-// form_preset_items.forEach(item => {
-//     const prompt = document.getElementById('prompt');
-//     item.addEventListener('click', () => {
-//         prompt.value = item.textContent;
-//     });
-// });
-// refreshPresets();
 const preset_button = document.getElementById('preset-button');
 preset_button.addEventListener('click', () => {
     const prompt = document.getElementById('prompt-text');
@@ -317,6 +301,7 @@ prompt_image_label.addEventListener('drop', (event) => {
         prompt_image_input.disabled = true;
     }
 });
+
 
 // Settings
 const form_use_random_seed = document.getElementById('use_random_seed');
