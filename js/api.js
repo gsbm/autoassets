@@ -18,6 +18,12 @@ const spaces = {
         url: "https://huggingface.co/spaces/hysts/SDXL",
         type: "image_sampler"
     },
+    flux1: {
+        label: "FLUX.1",
+        api: "black-forest-labs/FLUX.1-schnell",
+        url: "https://huggingface.co/spaces/black-forest-labs/FLUX.1-schnell",
+        type: "image_sampler"
+    },
     instantmesh: {
         label: "InstantMesh",
         api: "TencentARC/InstantMesh",
@@ -155,6 +161,32 @@ export async function generateImage(
             width: width,
             height: height,
             guidance_scale: guidance_scale_base,
+            num_inference_steps: num_inference_steps_base,
+        });
+        for await (const message of generation_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+    
+            }
+            if (message.type === "data") {
+                const {
+                    data: [result]
+                } = message;
+            
+                return result.url;
+            }
+        }
+    } else if (model === "flux1") {
+        /******************************************
+        Job: flux1
+        ******************************************/
+        // Generate image
+        const generation_job = client.submit("/infer", {
+            prompt: prompt,
+            seed: seed,
+            randomize_seed: false,
+            width: width,
+            height: height,
             num_inference_steps: num_inference_steps_base,
         });
         for await (const message of generation_job) {
