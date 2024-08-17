@@ -171,6 +171,7 @@ const viewer_content = document.querySelector('.viewer-content');
 
 let prompt_type = "type-text";
 
+
 /****************************************************************************************
 Form events
 ****************************************************************************************/
@@ -419,8 +420,8 @@ form_object.addEventListener('submit', async (event) => {
     generate_button.blur();
 
     const icon = generate_button.querySelector('.icon');
-    icon.classList.remove('mdi-creation');
-    icon.classList.add('mdi-loading');
+    icon.classList.remove('icon-sparkles');
+    icon.classList.add('icon-loader-circle');
 
     form_settings_label.blur();
     if (form_settings_container.classList.contains('active')) {
@@ -555,8 +556,8 @@ form_object.addEventListener('submit', async (event) => {
         generate_button.classList.remove('active');
         generate_button.querySelectorAll('span')[0].textContent = "Generate 3D Model";
 
-        icon.classList.remove('mdi-loading');
-        icon.classList.add('mdi-creation');
+        icon.classList.remove('icon-loader-circle');
+        icon.classList.add('icon-sparkles');
 
         viewer_preview.classList.remove('loading');
         viewer_preview.style.backgroundImage = 'none';
@@ -600,6 +601,10 @@ getSpacesAvailability().then((spaces_availability) => {
             status_label.classList.remove('error');
             status_label.classList.add('success');
             status_item_state.classList.add('success');
+
+            const status_item_state_icon = document.createElement('span');
+            status_item_state_icon.classList.add('icon-fan', 'icon');
+            status_item_state.appendChild(status_item_state_icon);
             i++;
         } else {
             status_label.classList.remove('success');
@@ -607,15 +612,8 @@ getSpacesAvailability().then((spaces_availability) => {
             status_item_state.classList.add('error');
         }
 
-        if (status_item_state.classList.contains('success')) {
-            const status_item_state_icon = document.createElement('span');
-            status_item_state_icon.classList.add('mdi', 'mdi-fan', 'icon');
-            status_item_state.appendChild(status_item_state_icon);
-        }
         status_item.appendChild(status_item_state);
-        
         status_content.appendChild(status_item);
-
 
         const select = document.getElementById(space_type);
         const option = document.createElement('option');
