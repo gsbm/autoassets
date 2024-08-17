@@ -529,6 +529,11 @@ Form
     pointer-events: none;
 }
 
+#generate-button .icon {
+    width: 16px;
+    height: 16px;
+}
+
 #generate-button.active .icon {
     animation: spin 1s linear infinite;
 }

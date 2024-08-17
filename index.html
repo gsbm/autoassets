@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/lucide-static@0.427.0/font/lucide.css">
 
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/style.css">
@@ -29,13 +29,13 @@
 <body>
 
     <div class="informations-container active">
-        <!-- <a href="https://github.com/greenmagenta/autosculptor" target="_blank" class="informations-banner">Download Autosculptor add-on for Blender <span class="icon mdi mdi-arrow-right"></span></a> -->
+        <!-- <a href="https://github.com/greenmagenta/autosculptor" target="_blank" class="informations-banner">Download Autosculptor add-on for Blender <span class="icon icon-chevron-right"></span></a> -->
     </div>
 
     <div class="properties-container">
         <button id="download-button">
             <span>Download 3D Model (0.00 MB)</span>
-            <span class="icon mdi mdi-download"></span>
+            <span class="icon icon-download"></span>
         </button>
     </div>
 
@@ -64,36 +64,36 @@
         <div class="status-label">
             <span id="status-amount">0/0</span>
             <span class="status-description">Operational Services</span>
-            <span class="icon mdi mdi-circle"></span>
+            <span class="icon icon-circle-dot"></span>
         </div>
     </div>
     
     <div class="form-container">
         <div class="form-type-container">
-            <div class="type-item active" id="type-text">Text<span class="mdi mdi-form-textbox"></span></div>
-            <div class="type-item" id="type-image">Image<span class="mdi mdi-camera"></span></div>
+            <div class="type-item active" id="type-text">Text<span class="icon-text-cursor-input"></span></div>
+            <div class="type-item" id="type-image">Image<span class="icon-image"></span></div>
         </div>
         <form id="form-data">
             <div class="main-form">
                 <div class="main-form-group">
                     <input class="form-input form-type-text" type="text" id="prompt-text" name="prompt" placeholder="Describe the 3D model you want to generate" required>
-                    <button type="button" class="form-input secondary form-type-text" id="preset-button"><span class="mdi mdi-shuffle"></span></button>
+                    <button type="button" class="form-input secondary form-type-text" id="preset-button"><span class="icon-shuffle"></span></button>
                     <input accept="image/png, image/gif, image/jpeg" class="form-input form-type-image type-disabled" type="file" id="prompt_image" name="prompt_image">
                     <label tabindex="0" class="form-input form-type-image type-disabled" for="prompt_image">
-                        <span class="input-file-label">Import or drag-and-drop an image<span class="mdi mdi-upload"></span></span>
-                        <span class="input-file-label active">Remove image<span class="mdi mdi-close"></span></span>
+                        <span class="input-file-label">Import or drag-and-drop an image<span class="icon-upload"></span></span>
+                        <span class="input-file-label active">Remove image<span class="icon-x"></span></span>
                         <div class="input-preview-image"></div>
                     </label>
                 </div>
                 <button type="submit" id="generate-button">
                     <span>Generate 3D Model</span>
-                    <span class="icon mdi mdi-creation"></span>
+                    <span class="icon icon-sparkles"></span>
                 </button>
             </div>
             <div class="form-settings-label" tabindex="0">
                 <span>Advanced</span>
                 <div class="icon">
-                    <span class="mdi mdi-chevron-down"></span>
+                    <span class="icon-chevron-down"></span>
                 </div>
             </div>
             <div class="form-settings-container">
@@ -164,7 +164,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="hf_api_key">Hugging Face Access Token<span data-tooltip="Add your Access Token with writing permission to get more GPU requests."><span class="icon mdi mdi-help-circle-outline"></span></span></label>
+                    <label for="hf_api_key">Hugging Face Access Token<span data-tooltip="Add your Access Token with writing permission to get more GPU requests."><span class="icon icon-circle-help"></span></span></label>
                     <input type="text" id="hf_api_key" name="hf_api_key" placeholder="hf...">
                 </div>
             </div>
