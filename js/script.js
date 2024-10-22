@@ -517,7 +517,7 @@ form_object.addEventListener('submit', async (event) => {
         const new_download_button = download_button.cloneNode(true);
         download_button.parentNode.replaceChild(new_download_button, download_button);
 
-        new_download_button.querySelectorAll('span')[0].textContent = `Download 3D Model (${weight} MB)`;
+        new_download_button.querySelectorAll('span')[0].textContent = `Download (${weight} MB)`;
         new_download_button.addEventListener('click', () => {
             const timestamp = new Date().toISOString().replace(/[-:.]/g, '').replace('T', '_').slice(0, -5);
             const a = document.createElement('a');
