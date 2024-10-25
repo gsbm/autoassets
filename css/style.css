@@ -1055,6 +1055,114 @@ Loader
 
 
 /****************************************************************************************
+Toast Messages
+****************************************************************************************/
+#toast-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 999999;
+    padding: 16px;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-foreground-010);
+    backdrop-filter: blur(16px);
+    border-radius: 8px;
+    padding: 16px 0;
+    max-width: 356px;
+    border-left: 2px solid;
+    transition: all linear 0.3s;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(calc(100% + 32px));
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
+}
+
+.toast--success {
+    border-color: #47d864;
+}
+
+.toast--success .toast-icon {
+    color: #47d864;
+}
+
+.toast--info {
+    border-color: #2f86eb;
+}
+
+.toast--info .toast-icon {
+    color: #2f86eb;
+}
+
+.toast--warning {
+    border-color: #ffc021;
+}
+
+.toast--warning .toast-icon {
+    color: #ffc021;
+}
+
+.toast--error {
+    border-color: #ff623d;
+}
+
+.toast--error .toast-icon {
+    color: #ff623d;
+}
+
+.toast + .toast {
+    margin-top: 24px;
+}
+
+.toast-icon {
+    font-size: 24px;
+}
+
+.toast-icon,
+.toast-close {
+    padding: 0 16px;
+}
+
+.toast__body {
+    flex-grow: 1;
+}
+
+.toast-title {
+    font-size: 14px;
+    color: var(--color-foreground-100);
+}
+
+.toast-message {
+    font-size: 14px;
+    color: var(--color-foreground-050);
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+.toast-close {
+    font-size: 20px;
+    color: var(--color-foreground-050);
+    cursor: pointer;
+}
+
+
+/****************************************************************************************
 Responsive
 ****************************************************************************************/
 @media screen and (max-width: 1200px) {
