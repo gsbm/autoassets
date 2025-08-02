@@ -1,4 +1,4 @@
-# Autoassets
+<h1><img src="assets/img/icon.svg" height="32px" style="transform: translateY(6px)"/> Autoassets</h1>
 
 Autoassets is a web application that allows users to quickly generate 3D models from simple textual or visual descriptions using state-of-the-art AI models. The platform integrates with Hugging Face Spaces and leverages models such as Stable Diffusion 3 Medium, Stable Diffusion XL, FLUX.1, and InstantMesh to create high-quality 3D assets from user prompts or images.
 
