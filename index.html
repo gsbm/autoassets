@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <title>Autoassets - Generate quickly 3D models from a simple textual or visual description</title>
+
+    <link rel="icon" href="assets/img/icon.svg">
+
+    <meta name="google-site-verification" content="n5yJLSJB-XuNZS0Agbs5fyaK5gcqXLpBukled2hyIko" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <!--<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.427.0/font/lucide.css">-->
+    <link rel="stylesheet" href="css/lucide.css">
+
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://unpkg.com/es-module-shims@1.7.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "@gradio/client": "https://cdn.jsdelivr.net/npm/@gradio/client@1.3.0/+esm",
+                "@huggingface/hub": "https://cdn.jsdelivr.net/npm/@huggingface/hub@0.15.1/+esm"
+            }
+        }
+    </script>
+    
+</head>
+<body>
+
+    <div class="informations-container active">
+        <!-- <a href="https://github.com/greenmagenta/autosculptor" target="_blank" class="informations-banner">Download Autosculptor add-on for Blender <span class="icon icon-chevron-right"></span></a> -->
+    </div>
+
+    <div class="properties-container">
+        <button id="download-button">
+            <span>Download (0.00 MB)</span>
+            <span class="icon icon-download"></span>
+        </button>
+    </div>
+
+    <div class="viewer-container">
+        <div class="viewer-preview"></div>
+        <model-viewer class="viewer-content" alt="" src="" shadow-intensity="1" camera-controls touch-action="pan-y" interaction-prompt="none" auto-rotate camera-orbit="9.698deg 72.69deg 8m" max-camera-orbit="0 0 8m" min-camera-orbit="0 0 5m"></model-viewer>
+    </div>
+
+    <div class="loader-container active static">
+        <div class="loader-cube">
+            <div class="cube">
+                <div class="cube-face-a"></div>
+                <div class="cube-face-b"></div>
+                <div class="cube-face-c"></div>
+                <div class="cube-face-d"></div>
+                <div class="cube-face-e"></div>
+                <div class="cube-face-f"></div>
+            </div>
+        </div>
+        <span class="loader-label">Write down a prompt to begin</span>
+    </div>
+    
+
+    <div class="status-container">
+        <div class="status-content"></div>
+        <div class="status-label">
+            <span id="status-amount">0/0</span>
+            <span class="status-description">Operational Services</span>
+            <span class="icon icon-circle-dot"></span>
+        </div>
+    </div>
+    
+    <div class="form-container">
+        <div class="form-type-container">
+            <div class="type-item active" id="type-text">Text<span class="icon-text-cursor-input"></span></div>
+            <div class="type-item" id="type-image">Image<span class="icon-image"></span></div>
+        </div>
+        <form id="form-data">
+            <div class="main-form">
+                <div class="main-form-group">
+                    <input class="form-input form-type-text" type="text" id="prompt-text" name="prompt" placeholder="Describe the 3D model you want to generate" required>
+                    <button type="button" class="form-input secondary form-type-text" id="preset-button"><span class="icon-shuffle"></span></button>
+                    <input accept="image/png, image/jpeg" class="form-input form-type-image type-disabled" type="file" id="prompt_image" name="prompt_image">
+                    <label tabindex="0" class="form-input form-type-image type-disabled" for="prompt_image">
+                        <span class="input-file-label">Import or drag-and-drop an image<span class="icon-upload"></span></span>
+                        <span class="input-file-label active">Remove image<span class="icon-x"></span></span>
+                        <div class="input-preview-image"></div>
+                    </label>
+                </div>
+                <button type="submit" id="generate-button">
+                    <span>Generate 3D Model</span>
+                    <span class="icon icon-sparkles"></span>
+                </button>
+            </div>
+            <div class="form-settings-label" tabindex="0">
+                <span>Advanced</span>
+                <div class="icon">
+                    <span class="icon-chevron-down"></span>
+                </div>
+            </div>
+            <div class="form-settings-container">
+                <div class="form-side">
+                    <div class="form-group">
+                        <label for="image_sampler">Image Sampler</label>
+                        <select type="text" id="image_sampler" name="image_sampler" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mesh_builder">Mesh Builder</label>
+                        <select type="text" id="mesh_builder" name="mesh_builder" required></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="additional_prompt">Additional Prompt</label>
+                    <input type="text" id="additional_prompt" name="additional_prompt" placeholder="Additional prompt to enhance generation" value="(3D model), (overall view), (white background), studio photo, blender, 3D render, large view, (single object)">
+                </div>
+                <div class="form-group">
+                    <label for="negative_prompt">Negative Prompt</label>
+                    <input type="text" id="negative_prompt" name="negative_prompt" placeholder="Describe what you don't want the model to generate" value="longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality">
+                </div>
+                <div class="form-group">
+                    <label for="sample_steps">Sample Steps</label>
+                    <input type="number" pattern="[0-9]*" id="sample_steps" name="sample_steps" value="75" min="30" max="75">
+                </div>
+                <div class="form-side">
+                    <div class="form-group">
+                        <label for="use_random_seed" class="checkbox">Use Random Seed</label>
+                        <input type="checkbox" id="use_random_seed" name="use_random_seed" checked>
+                    </div>
+                    <div class="form-group">
+                        <label for="seed">Seed</label>
+                        <input type="number" pattern="[0-9]*" id="seed" name="seed" value="0" min="0" max="1000000" disabled>
+                    </div>
+                </div>
+                <div class="form-side">
+                    <div class="form-group">
+                        <label for="width">Width</label>
+                        <input type="number" pattern="[0-9]*" id="width" name="width" value="1024" min="256" max="1024">
+                    </div>
+                    <div class="form-group">
+                        <label for="height">Height</label>
+                        <input type="number" pattern="[0-9]*" id="height" name="height" value="1024" min="256" max="1024">
+                    </div>
+                </div>
+                <div class="form-side">
+                    <div class="form-group">
+                        <label for="guidance_scale_base">Guidance Scale</label>
+                        <input type="number" pattern="[0-9]*" id="guidance_scale_base" name="guidance_scale_base" value="5" min="1" max="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="num_inference_steps_base">Number of Inference Steps</label>
+                        <input type="number" pattern="[0-9]*" id="num_inference_steps_base" name="num_inference_steps_base" value="25" min="10" max="100">
+                    </div>
+                </div>
+                <div class="form-side">
+                    <div class="form-group">
+                        <label for="apply_refiner" class="checkbox">Enable Refiner</label>
+                        <input type="checkbox" id="apply_refiner" name="apply_refiner">
+                    </div>
+                    <div class="form-group">
+                        <label for="guidance_scale_refiner">Guidance Scale (Refiner)</label>
+                        <input type="number" pattern="[0-9]*" id="guidance_scale_refiner" name="guidance_scale_refiner" value="5" min="1" max="20" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="num_inference_steps_refiner">Number of Inference Steps (Refiner)</label>
+                        <input type="number" pattern="[0-9]*" id="num_inference_steps_refiner" name="num_inference_steps_refiner" value="25" min="10" max="100" disabled>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="hf_api_key">Hugging Face Access Token<span data-tooltip="Add your Access Token with writing permission to get more GPU requests."><span class="icon icon-circle-help"></span></span></label>
+                    <input type="text" id="hf_api_key" name="hf_api_key" placeholder="hf...">
+                </div>
+            </div>
+        </form>
+        <div class="footer-container">
+            <span>By using Autoassets, you agree <a href="legal.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</span>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+</body>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/script.js"></script>
+
+</html>
