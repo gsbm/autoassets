@@ -29,6 +29,12 @@ const spaces = {
         api: "TencentARC/InstantMesh",
         url: "https://huggingface.co/spaces/TencentARC/InstantMesh",
         type: "mesh_builder"
+    },
+    trellis: {
+        label: "TRELLIS",
+        api: "hysts-mcp/TRELLIS",
+        url: "https://huggingface.co/spaces/hysts-mcp/TRELLIS",
+        type: "mesh_builder"
     }
 }
 
@@ -37,8 +43,20 @@ const spaces = {
 Stream status of jobs
 ****************************************************************************************/
 function streamStatus(status) {
-	// console.log(`The current status for this job is: ${JSON.stringify(status, null, 2)}`);
-    console.log(`Job status: ${status.endpoint} > ${status.stage}`);
+    const colors = {
+        complete: "rgb(163, 220, 154);",
+        error: "rgb(255, 171, 192);",
+        default: "rgb(252, 255, 223);"
+    };
+    const icons = {
+        complete: "✔",
+        error: "✖",
+    };
+
+    const color = colors[status.stage] || colors.default;
+    const icon = icons[status.stage] || "";
+
+    console.log(`%cJob status: ${status.endpoint} > ${status.stage} ${icon}${status.eta ? ` (eta ${status.eta})` : ""}`, color);
 
     if (status.stage === "error") {
         throw new Error(status.message);
@@ -192,7 +210,6 @@ export async function generateImage(
         for await (const message of generation_job) {
             if (message.type === "status") {
                 streamStatus(message);
-    
             }
             if (message.type === "data") {
                 const {
@@ -216,7 +233,9 @@ export async function generateMesh(
     image_url,
     sample_steps,
     seed,
-    model
+    model,
+    guidance_scale_base,
+    num_inference_steps_base,
 ) {
     // Connect to space
     const client = await Client.connect(spaces[model].api, {
@@ -247,7 +266,7 @@ export async function generateMesh(
                 streamStatus(message);
             }
             if (message.type === "data") {
-                var result_processed_image = message;        
+                var result_processed_image = message;
             }
         }
 
@@ -280,6 +299,71 @@ export async function generateMesh(
             }
             if (message.type === "data") {
                 return message.data[1].url;
+            }
+        }
+    } else if (model === "trellis") {
+        /******************************************
+        Job: trellis
+        ******************************************/
+        // Preprocess image
+        const preprocess_job = client.submit("/preprocess_image", [
+            handle_file(image_blob)
+        ]);
+        let result_processed_image;
+        for await (const message of preprocess_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
+            if (message.type === "data") {
+                result_processed_image = message;
+            }
+        }
+
+        // Fetch processed image
+        const processed_image = await fetch(result_processed_image.data[0].url);
+        if (!processed_image.ok) {
+            throw new Error("Failed to fetch the processed image");
+        }
+        const processed_image_blob = await processed_image.blob();
+
+        // Image to 3D
+        const image_to_3d_job = client.submit("/image_to_3d", {
+            image: handle_file(processed_image_blob),
+            seed: seed,
+            ss_guidance_strength: guidance_scale_base,
+            ss_sampling_steps: sample_steps,
+            slat_guidance_strength: guidance_scale_base,
+            slat_sampling_steps: num_inference_steps_base
+        });
+        let result_3d;
+        for await (const message of image_to_3d_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
+            if (message.type === "data") {
+                result_3d = message;
+            }
+        }
+
+        // Fetch state path
+        const state_file = await fetch(result_3d.data[0].url);
+        if (!state_file.ok) {
+            throw new Error("Failed to fetch the 3D model state file");
+        }
+        const state_file_blob = await state_file.blob();
+
+        // Extract GLB
+        const extract_glb_job = client.submit("/extract_glb", { 
+            state_path: state_file_blob,
+            mesh_simplify: 0.95,
+            texture_size: 1024,
+        });
+        for await (const message of extract_glb_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
+            if (message.type === "data") {
+                return message.data[0].url;
             }
         }
     } else {
