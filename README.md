@@ -48,8 +48,7 @@ Users retain ownership of the 3D models they generate, subject to the licenses a
 ### Terms of Service & Privacy
 
 - No user registration or login is required.
-- Only analytics data is collected via Google Search Console.
 - All user data is sent to Hugging Face for processing and may be stored as analytics by them.
 - The platform is intended for experimental and educational purposes only.
 - Users are responsible for ensuring their use of generated models complies with all relevant licenses and laws.
-- For more details, see [Terms of Service](https://gsbm.github.io/autoassets/legal.html) and [Privacy Policy](https://gsbm.github.io/autoassets/privacy.html).
+- For more details, see [Terms of Service](https://gsbm.github.io/autoassets/legal.html).
