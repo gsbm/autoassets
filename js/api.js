@@ -6,6 +6,13 @@ import { listSpaces } from "@huggingface/hub";
 Spaces configuration
 ****************************************************************************************/
 const spaces = {
+    flux1: {
+        label: "FLUX.1",
+        api: "black-forest-labs/FLUX.1-schnell",
+        url: "https://huggingface.co/spaces/black-forest-labs/FLUX.1-schnell",
+        type: "image_sampler",
+        steps: 1
+    },
     sd3m: {
         label: "Stable Diffusion 3 Medium",
         api: "stabilityai/stable-diffusion-3-medium",
@@ -17,13 +24,6 @@ const spaces = {
         label: "Stable Diffusion XL",
         api: "hysts/SDXL",
         url: "https://huggingface.co/spaces/hysts/SDXL",
-        type: "image_sampler",
-        steps: 1
-    },
-    flux1: {
-        label: "FLUX.1",
-        api: "black-forest-labs/FLUX.1-schnell",
-        url: "https://huggingface.co/spaces/black-forest-labs/FLUX.1-schnell",
         type: "image_sampler",
         steps: 1
     },
