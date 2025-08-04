@@ -590,6 +590,7 @@ getSpacesAvailability().then((spaces_availability) => {
         const space_type = space.type;
         const space_key = space.key;
         const space_runtime = space.runtime;
+        const space_api = space.api;
 
         const status_item = document.createElement('div');
         status_item.classList.add('status-item');
@@ -625,7 +626,8 @@ getSpacesAvailability().then((spaces_availability) => {
         const select = document.getElementById(space_type);
         const option = document.createElement('option');
         option.value = space_key;
-        option.textContent = space_label;
+        option.textContent = space_runtime === "RUNNING" ? "🟢 " + space_label : "🔴 " + space_label;
+        option.title = space_api + " ("+ space_runtime +")";
         select.appendChild(option);
     }
 
