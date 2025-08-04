@@ -162,10 +162,11 @@ const informations_container = document.querySelector('.informations-container')
 const loader_container = document.querySelector('.loader-container');
 const loader_label = document.querySelector('.loader-label');
 
-const status_container = document.querySelector('.status-container');
-const status_content = document.querySelector('.status-content');
-const status_label = document.querySelector('.status-label');
+// const status_container = document.querySelector('.status-container');
+// const status_content = document.querySelector('.status-content');
+// const status_label = document.querySelector('.status-label');
 
+const viewer_container = document.querySelector('.viewer-container');
 const viewer_preview = document.querySelector('.viewer-preview');
 const viewer_content = document.querySelector('.viewer-content');
 
@@ -179,6 +180,8 @@ Form events
 function toggleForm() {
     form_settings_container.classList.toggle('active');
     form_settings_label.classList.toggle('active');
+    loader_container.classList.toggle('blur');
+    viewer_container.classList.toggle('blur');
     // form_type_container.classList.toggle('disabled');
 }
 form_settings_label.addEventListener('click', toggleForm);
@@ -338,7 +341,7 @@ Viewer container events
     viewer_content.addEventListener(event, () => {
         form_container.classList.add('blur');
         properties_container.classList.add('blur');
-        status_container.classList.add('blur');
+        // status_container.classList.add('blur');
         if (form_settings_container.classList.contains('active')) {
             toggleForm();
         }
@@ -348,7 +351,7 @@ Viewer container events
     viewer_content.addEventListener(event, () => {
         form_container.classList.remove('blur');
         properties_container.classList.remove('blur');
-        status_container.classList.remove('blur');
+        // status_container.classList.remove('blur');
     });
 });
 
@@ -356,14 +359,14 @@ Viewer container events
 /****************************************************************************************
 Status container events
 ****************************************************************************************/
-status_label.addEventListener('mouseenter', () => {
-    status_label.classList.add('active');
-    status_content.classList.add('active');
-});
-status_container.addEventListener('mouseleave', () => {
-    status_label.classList.remove('active');
-    status_content.classList.remove('active');
-});
+// status_label.addEventListener('mouseenter', () => {
+//     status_label.classList.add('active');
+//     status_content.classList.add('active');
+// });
+// status_container.addEventListener('mouseleave', () => {
+//     status_label.classList.remove('active');
+//     status_content.classList.remove('active');
+// });
 
 
 /****************************************************************************************

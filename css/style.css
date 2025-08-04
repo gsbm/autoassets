@@ -766,6 +766,12 @@ Viewer
     align-items: center;
     justify-content: center;
     position: absolute;
+    opacity: 1;
+    transition: opacity 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.viewer-container.blur {
+    opacity: 0.25;
 }
 
 .viewer-preview {
@@ -942,8 +948,12 @@ Loader
     transition: opacity 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
+.loader-container.active.blur {
+    opacity: 0.25;
+}
+
 .loader-container.active {
-   opacity: 1;
+    opacity: 1;
 }
 
 .loader-container.active.static .loader-cube .cube,
