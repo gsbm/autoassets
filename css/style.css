@@ -236,7 +236,7 @@ input[type="file"] + label:disabled {
 
 input::placeholder,
 textarea::placeholder {
-    color: var(--color-foreground-050);
+    color: var(--color-foreground-025);
 }
 
 a {
