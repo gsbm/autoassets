@@ -491,12 +491,13 @@ Form
 .form-type-container {
     display: flex;
     flex-direction: row;
-    gap: 8px;
+    /* gap: 8px; */
     align-items: center;
     background-color: var(--color-foreground-010);
     color: var(--color-foreground-050);
-    padding: 8px;
-    border-radius: 16px;
+    /* padding: 8px; */
+    border-radius: 8px;
+    height: 39px;
     transition: transform 0.3s cubic-bezier(0.075, 0.82, 0.165, 1), opacity 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
@@ -508,12 +509,24 @@ Form
     transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
+    height: 100%;
+    border: 1px solid var(--color-foreground-010);
+}
+
+.type-item:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.type-item:last-child {
+    border-radius: 0 8px 8px 0;
 }
 
 .type-item.active {
-    background-color: var(--color-foreground-100);
-    color: var(--color-background-100);
+    background-color: var(--color-foreground-010);
+    color: var(--color-foreground-100);
     cursor: auto;
 }
 
@@ -525,7 +538,7 @@ Form
         background-color: var(--color-foreground-005);
     }
     .type-item.active:hover {
-        background-color: var(--color-foreground-100);
+        background-color: var(--color-foreground-010);
     }
 }
 
