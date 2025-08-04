@@ -48,17 +48,12 @@ const spaces = {
 Stream status of jobs
 ****************************************************************************************/
 function streamStatus(status, step = 1, max_step = 1) {
-    const colors = {
-        complete: "rgb(163, 220, 154);",
-        error: "rgb(255, 171, 192);",
-        default: "rgb(252, 255, 223);"
-    };
     const icons = {
         complete: "✔",
         error: "✖",
     };
 
-    console.log(`%cJob status ${step}/${max_step}: ${status.endpoint} > ${status.stage} ${icons[status.stage] || ""}${status.eta ? ` (eta ${status.eta})` : ""}`, colors[status.stage] || colors.default);
+    console.log(`Job status ${step}/${max_step}: ${status.endpoint} > ${status.stage} ${icons[status.stage] || ""}${status.eta ? ` (eta ${status.eta})` : ""}`);
 
     if (status.stage === "error") {
         throw new Error(status.message);
