@@ -18,11 +18,16 @@ Colors
     --color-error-050: rgba(234, 88, 12, 0.5);
     --color-error-025: rgba(234, 88, 12, 0.25);
     --color-error-010: rgba(234, 88, 12, 0.1);
-    --color-success-100: rgba(0, 200, 83, 1);
-    --color-success-075: rgba(0, 200, 83, 0.75);
-    --color-success-050: rgba(0, 200, 83, 0.5);
-    --color-success-025: rgba(0, 200, 83, 0.25);
-    --color-success-010: rgba(0, 200, 83, 0.1);
+    --color-success-100: rgb(26, 212, 82);
+    --color-success-075: rgba(26, 212, 82, 0.75);
+    --color-success-050: rgba(26, 212, 82, 0.5);
+    --color-success-025: rgba(26, 212, 82, 0.25);
+    --color-success-010: rgba(26, 212, 82, 0.1);
+    --color-warning-100: rgba(255, 222, 99, 1);
+    --color-warning-075: rgba(255, 222, 99, 0.75);
+    --color-warning-050: rgba(255, 222, 99, 0.5);
+    --color-warning-025: rgba(255, 222, 99, 0.25);
+    --color-warning-010: rgba(255, 222, 99, 0.1);
 }
 
 
@@ -318,6 +323,7 @@ Form
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    height: 39px;
 }
 
 .main-form-group input[type="text"]{
@@ -723,12 +729,12 @@ Status
 }
 
 .status-item-state.success {
-    background-color: var(--color-success-010);
+    /* background-color: var(--color-success-010); */
     color: var(--color-success-100);
 }
 
 .status-item-state.error {
-    background-color: var(--color-error-010);
+    /* background-color: var(--color-error-010); */
     color: var(--color-error-100);
 }
 
