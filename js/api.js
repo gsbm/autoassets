@@ -235,6 +235,7 @@ export async function generateMesh(
     model,
     guidance_scale_base,
     num_inference_steps_base,
+    size
 ) {
     // Connect to space
     const client = await Client.connect(spaces[model].api, {
@@ -357,7 +358,7 @@ export async function generateMesh(
         const extract_glb_job = client.submit("/extract_glb", { 
             state_path: state_file_blob,
             mesh_simplify: 0.95,
-            texture_size: 1024,
+            texture_size: size,
         });
         for await (const message of extract_glb_job) {
             if (message.type === "status") {

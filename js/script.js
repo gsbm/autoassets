@@ -502,6 +502,7 @@ form_object.addEventListener('submit', async (event) => {
             model_mesh_builder,
             guidance_scale_base,
             num_inference_steps_base,
+            width < height ? height : width
         );
         // console.log("Generated Mesh:", mesh_url);
 
