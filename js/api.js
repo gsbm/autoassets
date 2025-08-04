@@ -10,31 +10,36 @@ const spaces = {
         label: "Stable Diffusion 3 Medium",
         api: "stabilityai/stable-diffusion-3-medium",
         url: "https://huggingface.co/spaces/stabilityai/stable-diffusion-3-medium",
-        type: "image_sampler"
+        type: "image_sampler",
+        steps: 1
     },
     sdxl: {
         label: "Stable Diffusion XL",
         api: "hysts/SDXL",
         url: "https://huggingface.co/spaces/hysts/SDXL",
-        type: "image_sampler"
+        type: "image_sampler",
+        steps: 1
     },
     flux1: {
         label: "FLUX.1",
         api: "black-forest-labs/FLUX.1-schnell",
         url: "https://huggingface.co/spaces/black-forest-labs/FLUX.1-schnell",
-        type: "image_sampler"
+        type: "image_sampler",
+        steps: 1
     },
     instantmesh: {
         label: "InstantMesh",
         api: "TencentARC/InstantMesh",
         url: "https://huggingface.co/spaces/TencentARC/InstantMesh",
-        type: "mesh_builder"
+        type: "mesh_builder",
+        steps: 3
     },
     trellis: {
         label: "TRELLIS",
         api: "hysts-mcp/TRELLIS",
         url: "https://huggingface.co/spaces/hysts-mcp/TRELLIS",
-        type: "mesh_builder"
+        type: "mesh_builder",
+        steps: 3
     }
 }
 
@@ -42,7 +47,7 @@ const spaces = {
 /****************************************************************************************
 Stream status of jobs
 ****************************************************************************************/
-function streamStatus(status) {
+function streamStatus(status, step = 1, max_step = 1) {
     const colors = {
         complete: "rgb(163, 220, 154);",
         error: "rgb(255, 171, 192);",
@@ -53,10 +58,7 @@ function streamStatus(status) {
         error: "✖",
     };
 
-    const color = colors[status.stage] || colors.default;
-    const icon = icons[status.stage] || "";
-
-    console.log(`%cJob status: ${status.endpoint} > ${status.stage} ${icon}${status.eta ? ` (eta ${status.eta})` : ""}`, color);
+    console.log(`%cJob status ${step}/${max_step}: ${status.endpoint} > ${status.stage} ${icons[status.stage] || ""}${status.eta ? ` (eta ${status.eta})` : ""}`, colors[status.stage] || colors.default);
 
     if (status.stage === "error") {
         throw new Error(status.message);
@@ -130,6 +132,8 @@ export async function generateImage(
         hf_token: api_key,
         events: ["status", "data"]
     });
+
+    console.log("Running:", spaces[model].api);
 
     if (model === "sdxl") {
         /******************************************
@@ -243,6 +247,8 @@ export async function generateMesh(
         events: ["status", "data"]
     });
 
+    console.log("Running:", spaces[model].api);
+
     // Fetch image
     const image = await fetch(image_url);
     if (!image.ok) {
@@ -263,7 +269,7 @@ export async function generateMesh(
         ]);
         for await (const message of preprocess_job) {
             if (message.type === "status") {
-                streamStatus(message);
+                streamStatus(message, 1, spaces[model].steps);
             }
             if (message.type === "data") {
                 var result_processed_image = message;
@@ -287,7 +293,7 @@ export async function generateMesh(
         ]);
         for await (const message of generation_job) {
             if (message.type === "status") {
-                streamStatus(message);
+                streamStatus(message, 2, spaces[model].steps);
             }
         }
 
@@ -295,7 +301,7 @@ export async function generateMesh(
         const extrusion_job = client.submit("/make3d", []);
         for await (const message of extrusion_job) {
             if (message.type === "status") {
-                streamStatus(message);
+                streamStatus(message, 3, spaces[model].steps);
             }
             if (message.type === "data") {
                 return message.data[1].url;
@@ -312,7 +318,7 @@ export async function generateMesh(
         let result_processed_image;
         for await (const message of preprocess_job) {
             if (message.type === "status") {
-                streamStatus(message);
+                streamStatus(message, 1, spaces[model].steps);
             }
             if (message.type === "data") {
                 result_processed_image = message;
@@ -338,7 +344,7 @@ export async function generateMesh(
         let result_3d;
         for await (const message of image_to_3d_job) {
             if (message.type === "status") {
-                streamStatus(message);
+                streamStatus(message, 2, spaces[model].steps);
             }
             if (message.type === "data") {
                 result_3d = message;
@@ -360,7 +366,7 @@ export async function generateMesh(
         });
         for await (const message of extract_glb_job) {
             if (message.type === "status") {
-                streamStatus(message);
+                streamStatus(message, 3, spaces[model].steps);
             }
             if (message.type === "data") {
                 return message.data[0].url;

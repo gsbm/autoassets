@@ -571,65 +571,46 @@ form_object.addEventListener('submit', async (event) => {
     }
 });
 
-
 /****************************************************************************************
 Update the status of spaces on load
 ****************************************************************************************/
-getSpacesAvailability().then((spaces_availability) => {
-    const label = document.querySelector('#status-amount');
+getSpacesAvailability().then((spacesAvailability) => {
+    const available_image_sampler = [];
+    const unavailable_image_sampler = [];
+    const available_mesh_builder = [];
+    const unavailable_mesh_builder = [];
+    const select_image_sampler = document.getElementById('image_sampler');
+    const select_mesh_builder = document.getElementById('mesh_builder');
+    
+    spacesAvailability.forEach((space) => {
+        // Status item container
+        const statusItem = document.createElement('div');
+        statusItem.classList.add('status-item');
+        // if (spaceRuntime === 'RUNNING') {
+        const option = document.createElement('option');
+        option.value = space.key;
+        option.textContent = space.runtime === 'RUNNING' ? `🟢 ${space.label}` : space.runtime === 'PAUSED' ? `🟡 ${space.label}` : `🔴 ${space.label}`;
+        option.title = `${space.api} (${space.runtime})`;
 
-    while (status_content.firstChild) {
-        status_content.removeChild(status_content.firstChild);
-    }
-
-    let i = 0;
-    for (const space of spaces_availability) {
-
-        const space_label = space.label;
-        const space_url = space.url;
-        const space_type = space.type;
-        const space_key = space.key;
-        const space_runtime = space.runtime;
-        const space_api = space.api;
-
-        const status_item = document.createElement('div');
-        status_item.classList.add('status-item');
-
-        const status_item_link = document.createElement('a');
-        status_item_link.href = space_url;
-        status_item_link.target = '_blank';
-        status_item_link.textContent = space_label;
-        status_item.appendChild(status_item_link);
-
-        const status_item_state = document.createElement('span');
-        status_item_state.classList.add('status-item-state');
-
-        status_item_state.textContent = space_runtime.replace(/_/g, ' ').replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-        if (space_runtime === "RUNNING") {
-            status_label.classList.remove('error');
-            status_label.classList.add('success');
-            status_item_state.classList.add('success');
-
-            const status_item_state_icon = document.createElement('span');
-            status_item_state_icon.classList.add('icon-fan', 'icon');
-            status_item_state.appendChild(status_item_state_icon);
-            i++;
-        } else {
-            status_label.classList.remove('success');
-            status_label.classList.add('error');
-            status_item_state.classList.add('error');
+        if (space.type === 'image_sampler' && space.runtime === 'RUNNING') {
+            available_image_sampler.push(option);
+        } else if (space.type === 'image_sampler' && space.runtime !== 'RUNNING') {
+            unavailable_image_sampler.push(option);
         }
 
-        status_item.appendChild(status_item_state);
-        status_content.appendChild(status_item);
-
-        const select = document.getElementById(space_type);
-        const option = document.createElement('option');
-        option.value = space_key;
-        option.textContent = space_runtime === "RUNNING" ? "🟢 " + space_label : "🔴 " + space_label;
-        option.title = space_api + " ("+ space_runtime +")";
-        select.appendChild(option);
+        if (space.type === 'mesh_builder' && space.runtime === 'RUNNING') {
+            available_mesh_builder.push(option);
+        } else if (space.type === 'mesh_builder' && space.runtime !== 'RUNNING') {
+            unavailable_mesh_builder.push(option);
+        }
+    });
+    available_image_sampler.concat(unavailable_image_sampler).forEach(option => select_image_sampler.appendChild(option));
+    if (select_image_sampler.options.length > 0) {
+        select_image_sampler.selectedIndex = 0;
     }
-
-    label.textContent = i + '/' + spaces_availability.length;
+    
+    available_mesh_builder.concat(unavailable_mesh_builder).forEach(option => select_mesh_builder.appendChild(option));
+    if (select_mesh_builder.options.length > 0) {
+        select_mesh_builder.selectedIndex = 0;
+    }
 });
