@@ -330,10 +330,10 @@ export async function generateMesh(
         const image_to_3d_job = client.submit("/image_to_3d", {
             image: handle_file(processed_image_blob),
             seed: seed,
-            ss_guidance_strength: guidance_scale_base,
-            ss_sampling_steps: sample_steps,
-            slat_guidance_strength: guidance_scale_base,
-            slat_sampling_steps: num_inference_steps_base
+            ss_guidance_strength: guidance_scale_base > 50 ? 50 : guidance_scale_base,
+            ss_sampling_steps: sample_steps > 10 ? 10 : sample_steps,
+            slat_guidance_strength: guidance_scale_base > 50 ? 50 : guidance_scale_base,
+            slat_sampling_steps: num_inference_steps_base > 10 ? 10 : num_inference_steps_base
         });
         let result_3d;
         for await (const message of image_to_3d_job) {
