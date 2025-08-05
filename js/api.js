@@ -7,7 +7,7 @@ Spaces configuration
 ****************************************************************************************/
 const spaces = {
     flux1: {
-        label: "FLUX.1",
+        label: "FLUX.1-schnell",
         api: "black-forest-labs/FLUX.1-schnell",
         url: "https://huggingface.co/spaces/black-forest-labs/FLUX.1-schnell",
         type: "image_sampler",
@@ -28,7 +28,7 @@ const spaces = {
         steps: 1
     },
     qwen: {
-        label: "Qwen",
+        label: "Qwen Image",
         api: "Qwen/Qwen-Image",
         url: "https://huggingface.co/spaces/Qwen/Qwen-Image",
         type: "image_sampler",
