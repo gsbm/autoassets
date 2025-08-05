@@ -27,6 +27,13 @@ const spaces = {
         type: "image_sampler",
         steps: 1
     },
+    qwen: {
+        label: "Qwen",
+        api: "Qwen/Qwen-Image",
+        url: "https://huggingface.co/spaces/Qwen/Qwen-Image",
+        type: "image_sampler",
+        steps: 1
+    },
     instantmesh: {
         label: "InstantMesh",
         api: "TencentARC/InstantMesh",
@@ -205,6 +212,32 @@ export async function generateImage(
             width: width,
             height: height,
             num_inference_steps: num_inference_steps_base,
+        });
+        for await (const message of generation_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
+            if (message.type === "data") {
+                const {
+                    data: [result]
+                } = message;
+            
+                return result.url;
+            }
+        }
+    } else if (model === "qwen") {
+        /******************************************
+        Job: qwen
+        ******************************************/
+        // Generate image
+        const generation_job = client.submit("/infer", {
+            prompt: prompt,
+            seed: seed,
+            randomize_seed: false,
+            aspect_ratio: "1:1",
+            guidance_scale: guidance_scale_base,
+            num_inference_steps: num_inference_steps_base,
+            prompt_enhance: true
         });
         for await (const message of generation_job) {
             if (message.type === "status") {
