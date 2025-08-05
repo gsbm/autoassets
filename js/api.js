@@ -34,6 +34,13 @@ const spaces = {
         type: "image_sampler",
         steps: 1
     },
+    chroma: {
+        label: "Chroma",
+        api: "gokaygokay/Chroma",
+        url: "https://huggingface.co/spaces/gokaygokay/Chroma",
+        type: "image_sampler",
+        steps: 1
+    },
     instantmesh: {
         label: "InstantMesh",
         api: "TencentARC/InstantMesh",
@@ -238,6 +245,32 @@ export async function generateImage(
             guidance_scale: guidance_scale_base,
             num_inference_steps: num_inference_steps_base,
             prompt_enhance: true
+        });
+        for await (const message of generation_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
+            if (message.type === "data") {
+                const {
+                    data: [result]
+                } = message;
+            
+                return result.url;
+            }
+        }
+    } else if (model === "chroma") {
+        /******************************************
+        Job: chroma
+        ******************************************/
+        // Generate image
+        const generation_job = client.submit("/generate_image", {
+            prompt: prompt,
+            negative_prompt: negative_prompt,
+            width: width,
+            height: height,
+            steps: num_inference_steps_base,
+            cfg: guidance_scale_base,
+            seed: seed
         });
         for await (const message of generation_job) {
             if (message.type === "status") {
