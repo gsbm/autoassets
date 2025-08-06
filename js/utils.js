@@ -50,3 +50,39 @@ function displayToast({
         main.appendChild(toast);
     }
 }
+
+/****************************************************************************************
+Display a form event
+****************************************************************************************/
+function resetFormEvents() {
+    const container = document.querySelector('.form-event-container');
+    const eventItems = document.querySelectorAll('.form-event-wrapper .event-item');
+    container.classList.remove('active');
+    setTimeout(() => {
+        eventItems.forEach(eventItem => {
+            eventItem.remove();
+        });
+        previousEvent = "";
+    }, 300);
+}
+
+let previousEvent = "";
+function addFormEvent(event) {
+    if (event === previousEvent) {
+        return;
+    }
+    const container = document.querySelector('.form-event-container');
+    const wrapper = document.querySelector('.form-event-wrapper');
+    if (!container.classList.contains('active')) {
+        container.classList.add('active');
+    }
+    const eventItem = document.createElement('span');
+    eventItem.classList.add('event-item');
+    eventItem.textContent = event;
+    wrapper.appendChild(eventItem);
+    setTimeout(() => {
+        eventItem.classList.add('active');
+    }, 300);
+
+    previousEvent  = event;
+}

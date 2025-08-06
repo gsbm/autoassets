@@ -153,6 +153,8 @@ const form_container = document.querySelector('.form-container');
 const form_settings_container = document.querySelector('.form-settings-container');
 const form_settings_label = document.querySelector('.form-settings-label');
 
+const form_event_container = document.querySelector('.form-event-container');
+
 // const form_preset_container = document.querySelector('.form-preset-container');
 const form_type_container = document.querySelector('.form-type-container');
 
@@ -551,14 +553,15 @@ form_object.addEventListener('submit', async (event) => {
         // });
         
         // Reset display
+        form_event_container.classList.remove('active');
         loader_container.classList.add('active');
         loader_container.classList.add('static');
 
         informations_container.classList.add('active');
-        // form_preset_container.classList.remove('disabled');
 
     } finally {
         // Reset display
+        form_event_container.classList.remove('active');
         form_type_container.classList.remove('disabled');
         
         loader_label.classList.remove('pulse');

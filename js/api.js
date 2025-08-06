@@ -6,13 +6,6 @@ import { listSpaces } from "@huggingface/hub";
 Spaces configuration
 ****************************************************************************************/
 const spaces = {
-    flux1: {
-        label: "FLUX.1-schnell",
-        api: "black-forest-labs/FLUX.1-schnell",
-        url: "https://huggingface.co/spaces/black-forest-labs/FLUX.1-schnell",
-        type: "image_sampler",
-        steps: 1
-    },
     sd3m: {
         label: "Stable Diffusion 3 Medium",
         api: "stabilityai/stable-diffusion-3-medium",
@@ -24,6 +17,13 @@ const spaces = {
         label: "Stable Diffusion XL",
         api: "hysts/SDXL",
         url: "https://huggingface.co/spaces/hysts/SDXL",
+        type: "image_sampler",
+        steps: 1
+    },
+    flux1: {
+        label: "FLUX.1-schnell",
+        api: "black-forest-labs/FLUX.1-schnell",
+        url: "https://huggingface.co/spaces/black-forest-labs/FLUX.1-schnell",
         type: "image_sampler",
         steps: 1
     },
@@ -68,6 +68,7 @@ function streamStatus(status, step = 1, max_step = 1) {
     };
 
     console.log(`Job status ${step}/${max_step}: ${status.endpoint} > ${status.stage} ${icons[status.stage] || ""}${status.eta ? ` (eta ${status.eta})` : ""}`);
+    addFormEvent(`Job status ${step}/${max_step}: ${status.endpoint} > ${status.stage} ${icons[status.stage] || ""}${status.eta ? ` (eta ${status.eta})` : ""}`);
 
     if (status.stage === "error") {
         throw new Error(status.message);
@@ -143,6 +144,7 @@ export async function generateImage(
     });
 
     console.log("Running:", spaces[model].api);
+    addFormEvent(`Running: ${spaces[model].api}`);
 
     if (model === "sdxl") {
         /******************************************
@@ -310,6 +312,7 @@ export async function generateMesh(
     });
 
     console.log("Running:", spaces[model].api);
+    addFormEvent(`Running: ${spaces[model].api}`);
 
     // Fetch image
     const image = await fetch(image_url);

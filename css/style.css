@@ -353,6 +353,63 @@ Form
     white-space: nowrap;
 }
 
+.form-event-container {
+    width: calc(100% - 128px);
+    height: 0;
+    left: 64px;
+    right: 64px;
+    font-size: 14px;
+    color: var(--color-foreground-050);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: column;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.075, 0.82, 0.165, 1), height 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.form-event-container.active {
+    opacity: 1;
+    height: 40px;
+}
+
+.form-event-wrapper {
+    display: flex;
+    gap: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: fit-content;
+}
+
+.form-event-wrapper .event-item {
+    font-family: 'Consolas', 'Monaco', 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace !important;
+    height: 0;
+    opacity: 0;
+    margin-top: 0;
+    font-size: 14px;
+    overflow: hidden;
+    transition: 1s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.form-event-wrapper .event-item.active {
+    height: auto;
+    margin-top: 8px;
+    opacity: 1;
+}
+
+.form-event-container::after {
+    content: "";
+    position: absolute;
+    width: calc(100% - 128px);
+    height: 40px;
+    background: linear-gradient(to bottom, var(--color-background-100) 0%, var(--color-background-025) 85%, transparent 100%);
+}
+
 .form-settings-container {
     position: relative;
     display: flex;
