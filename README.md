@@ -1,6 +1,6 @@
 <h1><img src="assets/img/icon.svg" height="28px" style="transform: translateY(6px)"/> Autoassets</h1>
 
-Autoassets is a web application that allows users to quickly generate 3D models from simple textual or visual descriptions using state-of-the-art AI models. The platform integrates with Hugging Face Spaces and leverages models such as Stable Diffusion 3 Medium, Stable Diffusion XL, FLUX.1, and InstantMesh to create high-quality 3D assets from user prompts or images.
+Autoassets is a web application that allows users to quickly generate 3D models from simple textual or visual descriptions using state-of-the-art AI models. The platform integrates with Hugging Face Spaces and leverages models such as Stable Diffusion 3 Medium, Stable Diffusion XL, FLUX.1, Qwen Image, Chroma, InstantMesh, and TRELLIS to create high-quality 3D assets from user prompts or images.
 
 ## Documentation
 
@@ -38,10 +38,13 @@ Some models (like SDXL) may have additional advanced parameters:
 Autoassets and its dependencies are licensed as follows:
 
 - **Autoassets**: GPL-3 License (see `LICENSE` file).
-- **SDXL**: MIT License.
+- **Stable Diffusion XL**: MIT License.
 - **Stable Diffusion 3 Medium**: MIT License.
-- **FLUX.1**: MIT License.
+- **FLUX.1-schnell**: MIT License.
+- **Qwen Image**: Apache License 2.0.
+- **Chroma**: Apache License 2.0.
 - **InstantMesh**: Apache License 2.0.
+- **TRELLIS**: MIT License.
 
 Users retain ownership of the 3D models they generate, subject to the licenses and terms of use of the generative models provided by Hugging Face, SDXL, and InstantMesh.
 
