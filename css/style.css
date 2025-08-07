@@ -2,32 +2,37 @@
 Colors
 ****************************************************************************************/
 :root {
-    --color-foreground-100: rgba(250, 250, 250, 1);
-    --color-foreground-075: rgba(250, 250, 250, 0.75);
-    --color-foreground-050: rgba(250, 250, 250, 0.5);
-    --color-foreground-025: rgba(250, 250, 250, 0.25);
-    --color-foreground-010: rgba(250, 250, 250, 0.1);
-    --color-foreground-005: rgba(250, 250, 250, 0.05);
-    --color-background-100: rgba(9, 9, 11, 1);
-    --color-background-075: rgba(9, 9, 11, 0.75);
-    --color-background-050: rgba(9, 9, 11, 0.5);
-    --color-background-025: rgba(9, 9, 11, 0.25);
-    --color-background-010: rgba(9, 9, 11, 0.1);
-    --color-error-100: rgba(234, 88, 12, 1);
-    --color-error-075: rgba(234, 88, 12, 0.75);
-    --color-error-050: rgba(234, 88, 12, 0.5);
-    --color-error-025: rgba(234, 88, 12, 0.25);
-    --color-error-010: rgba(234, 88, 12, 0.1);
+    --color-foreground-100: rgb(254, 250, 239);
+    --color-foreground-075: rgba(254, 250, 239, 0.75);
+    --color-foreground-050: rgba(254, 250, 239, 0.5);
+    --color-foreground-025: rgba(254, 250, 239, 0.25);
+    --color-foreground-010: rgba(254, 250, 239, 0.1);
+    --color-foreground-005: rgba(254, 250, 239, 0.05);
+    --color-background-100: rgb(22, 19, 14);
+    --color-background-075: rgba(22, 19, 14, 0.75);
+    --color-background-050: rgba(22, 19, 14, 0.5);
+    --color-background-025: rgba(22, 19, 14, 0.25);
+    --color-background-010: rgba(22, 19, 14, 0.1);
+    --color-error-100: rgb(255, 110, 32);
+    --color-error-075: rgba(255, 110, 32, 0.75);
+    --color-error-050: rgba(255, 110, 32, 0.5);
+    --color-error-025: rgba(255, 110, 32, 0.25);
+    --color-error-010: rgba(255, 110, 32, 0.1);
     --color-success-100: rgb(26, 212, 82);
     --color-success-075: rgba(26, 212, 82, 0.75);
     --color-success-050: rgba(26, 212, 82, 0.5);
     --color-success-025: rgba(26, 212, 82, 0.25);
     --color-success-010: rgba(26, 212, 82, 0.1);
-    --color-warning-100: rgba(255, 222, 99, 1);
-    --color-warning-075: rgba(255, 222, 99, 0.75);
-    --color-warning-050: rgba(255, 222, 99, 0.5);
-    --color-warning-025: rgba(255, 222, 99, 0.25);
-    --color-warning-010: rgba(255, 222, 99, 0.1);
+    --color-warning-100: rgb(245, 180, 0);
+    --color-warning-075: rgba(245, 180, 0, 0.75);
+    --color-warning-050: rgba(245, 180, 0, 0.5);
+    --color-warning-025: rgba(245, 180, 0, 0.25);
+    --color-warning-010: rgba(245, 180, 0, 0.1);
+    --color-info-100: rgb(86, 172, 243);
+    --color-info-075: rgba(86, 172, 243, 0.75);
+    --color-info-050: rgba(86, 172, 243, 0.5);
+    --color-info-025: rgba(86, 172, 243, 0.25);
+    --color-info-010: rgba(86, 172, 243, 0.1);
 }
 
 
@@ -35,22 +40,37 @@ Colors
 Colors : Light
 ****************************************************************************************/
 :root.light {
-    --color-foreground-100: rgb(46, 43, 41);
-    --color-foreground-075: rgba(46, 43, 41, 0.75);
-    --color-foreground-050: rgba(46, 43, 41, 0.5);
-    --color-foreground-025: rgba(46, 43, 41, 0.25);
-    --color-foreground-010: rgba(46, 43, 41, 0.1);
-    --color-foreground-005: rgba(46, 43, 41, 0.05);
+    --color-foreground-100: rgb(65, 56, 41);
+    --color-foreground-075: rgba(65, 56, 41, 0.75);
+    --color-foreground-050: rgba(65, 56, 41, 0.5);
+    --color-foreground-025: rgba(65, 56, 41, 0.25);
+    --color-foreground-010: rgba(65, 56, 41, 0.1);
+    --color-foreground-005: rgba(65, 56, 41, 0.05);
     --color-background-100: rgb(254, 250, 239);
     --color-background-075: rgba(254, 250, 239, 0.75);
     --color-background-050: rgba(254, 250, 239, 0.5);
     --color-background-025: rgba(254, 250, 239, 0.25);
     --color-background-010: rgba(254, 250, 239, 0.1);
-    --color-warning-100: rgb(155, 144, 0);
-    --color-warning-075: rgba(155, 144, 0, 0.75);
-    --color-warning-050: rgba(155, 144, 0, 0.5);
-    --color-warning-025: rgba(155, 144, 0, 0.25);
-    --color-warning-010: rgba(155, 144, 0, 0.1);
+    --color-warning-100: rgb(202, 148, 0);
+    --color-warning-075: rgba(202, 148, 0, 0.75);
+    --color-warning-050: rgba(202, 148, 0, 0.5);
+    --color-warning-025: rgba(202, 148, 0, 0.25);
+    --color-warning-010: rgba(202, 148, 0, 0.1);
+    --color-error-100: rgb(201, 70, 0);
+    --color-error-075: rgba(201, 70, 0, 0.75);
+    --color-error-050: rgba(201, 70, 0, 0.5);
+    --color-error-025: rgba(201, 70, 0, 0.25);
+    --color-error-010: rgba(201, 70, 0, 0.1);
+    --color-info-100: rgb(3, 117, 211);
+    --color-info-075: rgba(3, 117, 211, 0.75);
+    --color-info-050: rgba(3, 117, 211, 0.5);
+    --color-info-025: rgba(3, 117, 211, 0.25);
+    --color-info-010: rgba(3, 117, 211, 0.1);
+    --color-success-100: rgb(0, 180, 54);
+    --color-success-075: rgba(0, 180, 54, 0.75);
+    --color-success-050: rgba(0, 180, 54, 0.5);
+    --color-success-025: rgba(0, 180, 54, 0.25);
+    --color-success-010: rgba(0, 180, 54, 0.1);
 }
 :root.light .status-content {
     background-color: var(--color-background-100);
@@ -462,7 +482,7 @@ Form
 .form-settings-label,
 .form-settings-container,
 .type-item {
-    border: 1px solid var(--color-foreground-010);
+    border: 1px solid var(--color-foreground-005);
     box-shadow: 0 0px 2px var(--color-foreground-010);
 }
 
@@ -733,6 +753,36 @@ Form
     color: var(--color-foreground-100);
 }
 
+.banner-wrapper {
+    display: flex;
+    gap: 4px;
+    padding: 8px;
+    background-color: var(--color-foreground-010);
+    color: var(--color-foreground-075);
+    border-radius: 8px;
+    font-size: 0.85em
+}
+
+.banner-wrapper.--warning {
+    background-color: var(--color-warning-025);
+    color: var(--color-foreground-075);
+}
+
+.banner-wrapper.--error {
+    background-color: var(--color-error-025);
+    color: var(--color-foreground-075);
+}
+
+.banner-wrapper.--success {
+    background-color: var(--color-success-025);
+    color: var(--color-foreground-075);
+}
+
+.banner-wrapper.--info {
+    background-color: var(--color-info-025);
+    color: var(--color-foreground-075);
+}
+
 
 /****************************************************************************************
 Status
@@ -980,7 +1030,7 @@ Tooltip
     z-index: 99;
     cursor: help;
 }
-  
+
 [data-tooltip]:before,
 [data-tooltip]:after {
     visibility: hidden;
@@ -991,7 +1041,7 @@ Tooltip
     transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
     transform: translateY(8px);
 }
-  
+
 [data-tooltip]:before {
     position: absolute;
     bottom: 150%;
@@ -1013,7 +1063,7 @@ Tooltip
     font-size: 12px;
     font-family: "Rubik", sans-serif;
 }
-  
+
 [data-tooltip]:after {
     position: absolute;
     bottom: 150%;
@@ -1221,35 +1271,35 @@ Toast Messages
 }
 
 .toast--success {
-    border-color: #47d864;
+    border-color: var(--color-success-100);
 }
 
 .toast--success .toast-icon {
-    color: #47d864;
+    color: var(--color-success-100);
 }
 
 .toast--info {
-    border-color: #2f86eb;
+    border-color: var(--color-foreground-100);
 }
 
 .toast--info .toast-icon {
-    color: #2f86eb;
+    color: var(--color-foreground-100);
 }
 
 .toast--warning {
-    border-color: #ffc021;
+    border-color: var(--color-warning-100);
 }
 
 .toast--warning .toast-icon {
-    color: #ffc021;
+    color: var(--color-warning-100);
 }
 
 .toast--error {
-    border-color: #ff623d;
+    border-color: var(--color-error-100);
 }
 
 .toast--error .toast-icon {
-    color: #ff623d;
+    color: var(--color-error-100);
 }
 
 .toast + .toast {
