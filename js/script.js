@@ -12,26 +12,6 @@ Language handler
 
 
 /****************************************************************************************
-Update sheme based on user preference
-****************************************************************************************/
-function updateColorScheme(type) {
-    const root = document.querySelector(':root')
-    if (type === "light") {
-        root.classList.add('light');
-    } else {
-        root.classList.remove('light');
-    }
-}
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-    updateColorScheme("light");
-}
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-    const new_color_scheme = event.matches ? "dark" : "light";
-    updateColorScheme(new_color_scheme);
-});
-
-
-/****************************************************************************************
 Prompt presets list
 ****************************************************************************************/
 const preset_list = [
