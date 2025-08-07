@@ -453,6 +453,41 @@ Form
     transition: background-color 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
+.main-form,
+.form-settings-label,
+.form-settings-container,
+.type-item {
+    border: 1px solid var(--color-foreground-010);
+    box-shadow: 0 0px 2px var(--color-foreground-010);
+}
+
+.type-item:not(:first-child):not(.active),
+.type-item:not(:first-child):not(:last-child):not(.active) {
+    border-left: 1px solid transparent;
+}
+
+.type-item:not(:last-child):not(.active),
+.type-item:not(:first-child):not(:last-child):not(.active) {
+    border-right: 1px solid transparent;
+}
+
+.type-item:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+.form-settings-label,
+.form-settings-container {
+    border-top: 1px solid transparent;
+}
+
+.form-settings-label.active {
+    z-index: 2;
+}
+
+#preset-button {
+    border-left: 1px solid transparent;
+}
+
 @media (hover: hover) {
     .form-settings-label:hover {
         background-color: var(--color-foreground-005);
