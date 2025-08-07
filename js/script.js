@@ -164,6 +164,12 @@ function toggleForm() {
     form_settings_label.classList.toggle('active');
     loader_container.classList.toggle('blur');
     viewer_container.classList.toggle('blur');
+    if (form_settings_container.classList.contains('active')) {
+        form_event_container.classList.add('hidden');
+    } else {
+        form_event_container.classList.remove('hidden');
+    }
+    
     // form_type_container.classList.toggle('disabled');
 }
 form_settings_label.addEventListener('click', toggleForm);

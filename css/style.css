@@ -396,6 +396,11 @@ Form
     transition: opacity 0.3s cubic-bezier(0.075, 0.82, 0.165, 1), height 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
+.form-event-container.hidden {
+    opacity: 0 !important;
+    height: 0 !important;
+}
+
 .form-event-container.active {
     opacity: 1;
     height: 40px;
