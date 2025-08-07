@@ -323,7 +323,7 @@ Form
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    height: 39px;
+    min-height: 39px;
 }
 
 .main-form-group input[type="text"]{
