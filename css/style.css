@@ -1395,11 +1395,6 @@ Responsive
         font-size: 12px;
     }
 
-    .footer-container {
-        /* flex-direction: column; */
-        gap: 16px;
-    }
-
     .form-container {
         padding-left: 48px;
         padding-right: 48px;
@@ -1438,5 +1433,12 @@ Responsive
 
     .form-preset-container {
         display: none;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .footer-container {
+        flex-direction: column;
+        gap: 16px;
     }
 }
