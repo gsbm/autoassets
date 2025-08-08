@@ -43,6 +43,7 @@ Autoassets and its dependencies are licensed as follows:
 - **FLUX.1-schnell**: MIT License.
 - **Qwen Image**: Apache License 2.0.
 - **Chroma**: Apache License 2.0.
+- **BLIP 3o**: Apache License 2.0.
 - **InstantMesh**: Apache License 2.0.
 - **TRELLIS**: MIT License.
 
