@@ -41,6 +41,13 @@ const spaces = {
         type: "image_sampler",
         steps: 1
     },
+    blip3o: {
+        label: "BLIP3-o",
+        api: "BLIP3o/blip-3o",
+        url: "https://huggingface.co/spaces/BLIP3o/blip-3o",
+        type: "image_sampler",
+        steps: 1
+    },
     instantmesh: {
         label: "InstantMesh",
         api: "TencentARC/InstantMesh",
@@ -284,6 +291,31 @@ export async function generateImage(
                 } = message;
             
                 return result.url;
+            }
+        }
+    } else if (model === "blip3o") {
+        /******************************************
+        Job: blip3o
+        ******************************************/
+        // Generate image
+        const generation_job = client.submit("/run_generate_image_tab", {
+            prompt: prompt,
+            seed: seed,
+            guidance: guidance_scale_base,
+            num_images: 1,
+        });
+        for await (const message of generation_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
+            if (message.type === "data") {
+                const {
+                    data: [result]
+                } = message;
+
+                console.log(result)
+            
+                return result.value[0].image.url;
             }
         }
     } else {
