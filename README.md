@@ -48,7 +48,7 @@ Autoassets and its dependencies are licensed as follows:
 
 Users retain ownership of the 3D models they generate, subject to the licenses and terms of use of the generative models provided by Hugging Face, SDXL, and InstantMesh.
 
-### Terms of Service & Privacy
+### Terms of Service
 
 - No user registration or login is required.
 - All user data is sent to Hugging Face for processing and may be stored as analytics by them.
