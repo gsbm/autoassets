@@ -1436,4 +1436,8 @@ Responsive
     .form-preset-container {
         display: none;
     }
+
+    .form-event-container {
+        display: none;
+    }
 }
