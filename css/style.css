@@ -913,6 +913,8 @@ Footer
     gap: 16px;
     font-size: 10px;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .footer-container * {
@@ -1433,12 +1435,5 @@ Responsive
 
     .form-preset-container {
         display: none;
-    }
-}
-
-@media screen and (max-width: 400px) {
-    .footer-container {
-        flex-direction: column;
-        gap: 16px;
     }
 }
