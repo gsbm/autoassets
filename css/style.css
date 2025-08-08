@@ -1396,7 +1396,7 @@ Responsive
     }
 
     .footer-container {
-        flex-direction: column;
+        /* flex-direction: column; */
         gap: 16px;
     }
 
