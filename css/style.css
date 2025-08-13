@@ -257,6 +257,7 @@ button:disabled,
 select:disabled,
 input[type="file"] + label:disabled {
     opacity: 0.5;
+    pointer-events: none;
 }
 
 input::placeholder,

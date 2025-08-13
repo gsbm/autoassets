@@ -574,6 +574,9 @@ getSpacesAvailability().then((spacesAvailability) => {
     const unavailable_mesh_builder = [];
     const select_image_sampler = document.getElementById('image_sampler');
     const select_mesh_builder = document.getElementById('mesh_builder');
+    const button_generate = document.getElementById('generate-button');
+
+    button_generate.disabled = true;
     
     spacesAvailability.forEach((space) => {
         // Status item container
@@ -605,5 +608,9 @@ getSpacesAvailability().then((spacesAvailability) => {
     available_mesh_builder.concat(unavailable_mesh_builder).forEach(option => select_mesh_builder.appendChild(option));
     if (select_mesh_builder.options.length > 0) {
         select_mesh_builder.selectedIndex = 0;
+    }
+
+    if (available_image_sampler.length > 0 && available_mesh_builder.length > 0) {
+        button_generate.disabled = false;
     }
 });
