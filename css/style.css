@@ -652,6 +652,10 @@ Form
     cursor: auto;
 }
 
+.form-type-container.disabled .type-item {
+    pointer-events: none;
+}
+
 @media (hover: hover) {
     .preset-item:hover {
         background-color: var(--color-foreground-005);
