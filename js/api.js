@@ -108,9 +108,9 @@ Get spaces availability
 ****************************************************************************************/
 export async function getSpacesAvailability() {
     let spaces_availability = [];
-
     for (const space_id of Object.values(spaces)) {
         let runtime = await getSpaceRuntime(space_id.api);
+        let stage = runtime == null ? "ERROR" : runtime.stage;
 
         spaces_availability.push({
             label: space_id.label,
@@ -118,10 +118,9 @@ export async function getSpacesAvailability() {
             url: space_id.url,
             type: space_id.type,
             key: Object.keys(spaces).find(key => spaces[key] === space_id),
-            runtime: runtime.stage
+            runtime: stage
         });
     }
-
     return spaces_availability;
 }
 
