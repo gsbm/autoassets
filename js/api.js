@@ -61,6 +61,13 @@ const spaces = {
         url: "https://huggingface.co/spaces/hysts-mcp/TRELLIS",
         type: "mesh_builder",
         steps: 3
+    },
+    trellis2: {
+        label: "TRELLIS.2",
+        api: "microsoft/TRELLIS.2",
+        url: "https://huggingface.co/spaces/microsoft/TRELLIS.2",
+        type: "mesh_builder",
+        steps: 1
     }
 }
 
@@ -468,6 +475,50 @@ export async function generateMesh(
                 return message.data[0].url;
             }
         }
+    } else if (model === "trellis2") {
+        /******************************************
+        Job: trellis2 (microsoft/TRELLIS.2)
+        ******************************************/
+        const resolution = size >= 1536 ? "1536" : size >= 1024 ? "1024" : "512";
+        const generation_job = client.submit("/image_to_3d", {
+            image: handle_file(image_blob),
+            seed: seed,
+            resolution: resolution,
+            ss_guidance_strength: 7.5,
+            ss_guidance_rescale: 0.7,
+            ss_sampling_steps: 12,
+            ss_rescale_t: 5,
+            shape_slat_guidance_strength: 7.5,
+            shape_slat_guidance_rescale: 0.5,
+            shape_slat_sampling_steps: 12,
+            shape_slat_rescale_t: 3,
+            tex_slat_guidance_strength: 1,
+            tex_slat_guidance_rescale: 0,
+            tex_slat_sampling_steps: 12,
+            tex_slat_rescale_t: 3,
+        });
+        let result_3d;
+        for await (const message of generation_job) {
+            if (message.type === "status") {
+                streamStatus(message, 1, spaces[model].steps);
+            }
+            if (message.type === "data") {
+                result_3d = message;
+            }
+        }
+        const raw = result_3d.data[0];
+        const meshUrl = typeof raw === "object" && raw?.url
+            ? raw.url
+            : typeof raw === "string" && raw.startsWith("http")
+                ? raw
+                : (() => {
+                    const match = typeof raw === "string" && raw.match(/href=["'](https?:\/\/[^"']+\.glb)["']/);
+                    return match ? match[1] : raw;
+                })();
+        if (!meshUrl || typeof meshUrl !== "string" || !meshUrl.startsWith("http")) {
+            throw new Error("TRELLIS.2 did not return a mesh URL");
+        }
+        return meshUrl;
     } else {
         throw new Error("Unknown or unsupported model");
     }
