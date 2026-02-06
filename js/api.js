@@ -157,7 +157,7 @@ export async function generateImage(
         Job: sdxl
         ******************************************/
         // Generate image
-        const generation_job = client.submit("/run", {
+        const generation_job = client.submit("/predict", {
             prompt: prompt,
             negative_prompt: negative_prompt,
             prompt_2: "",
