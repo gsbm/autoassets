@@ -27,6 +27,13 @@ const spaces = {
         type: "image_sampler",
         steps: 1
     },
+    flux2: {
+        label: "FLUX.2-klein",
+        api: "black-forest-labs/FLUX.2-klein-9B",
+        url: "https://huggingface.co/spaces/black-forest-labs/FLUX.2-klein-9B",
+        type: "image_sampler",
+        steps: 1
+    },
     qwen: {
         label: "Qwen Image",
         api: "Qwen/Qwen-Image",
@@ -245,6 +252,31 @@ export async function generateImage(
                 } = message;
             
                 return result.url;
+            }
+        }
+    } else if (model === "flux2") {
+        /******************************************
+        Job: flux2 (FLUX.2 Klein 9B)
+        ******************************************/
+        const generation_job = client.submit("/generate", {
+            prompt: prompt,
+            input_images: [],
+            mode_choice: "Distilled (4 steps)",
+            seed: seed,
+            randomize_seed: false,
+            width: width,
+            height: height,
+            num_inference_steps: 4,
+            guidance_scale: 1,
+            prompt_upsampling: false,
+        });
+        for await (const message of generation_job) {
+            if (message.type === "status") {
+                streamStatus(message);
+            }
+            if (message.type === "data") {
+                const [imageResult] = message.data;
+                return imageResult?.url ?? imageResult;
             }
         }
     } else if (model === "qwen") {
