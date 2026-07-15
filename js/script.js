@@ -139,7 +139,6 @@ const form_event_container = document.querySelector('.form-event-container');
 const form_type_container = document.querySelector('.form-type-container');
 
 const properties_container = document.querySelector('.properties-container');
-const informations_container = document.querySelector('.informations-container');
 
 const loader_container = document.querySelector('.loader-container');
 const loader_label = document.querySelector('.loader-label');
@@ -400,7 +399,6 @@ form_object.addEventListener('submit', async (event) => {
     viewer_content.classList.remove('active');
 
     properties_container.classList.remove('active');
-    informations_container.classList.add('active');
 
     loader_container.classList.add('active');
     loader_container.classList.remove('static');
@@ -523,7 +521,6 @@ form_object.addEventListener('submit', async (event) => {
         // Update display
         loader_container.classList.remove('active');
         properties_container.classList.add('active');
-        informations_container.remove('active');
 
     } catch (error) {
         console.error(error);
@@ -542,8 +539,6 @@ form_object.addEventListener('submit', async (event) => {
         form_event_container.classList.remove('active');
         loader_container.classList.add('active');
         loader_container.classList.add('static');
-
-        informations_container.classList.add('active');
 
     } finally {
         // Reset display

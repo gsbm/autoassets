@@ -12,28 +12,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
-    <!--<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.427.0/font/lucide.css">-->
     <link rel="stylesheet" href="css/lucide.css">
 
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/style.css">
 
-    <script src="https://unpkg.com/es-module-shims@1.7.0/dist/es-module-shims.js"></script>
+    <script src="https://unpkg.com/es-module-shims@2.8.2/dist/es-module-shims.js"></script>
     <script type="importmap">
         {
             "imports": {
-                "@gradio/client":  "https://cdn.jsdelivr.net/npm/@gradio/client@1.15.0/+esm",
-                "@huggingface/hub": "https://cdn.jsdelivr.net/npm/@huggingface/hub@2.4.0/+esm"
+                "@gradio/client":  "https://cdn.jsdelivr.net/npm/@gradio/client@2.3.1/+esm",
+                "@huggingface/hub": "https://cdn.jsdelivr.net/npm/@huggingface/hub@2.13.3/+esm"
             }
         }
     </script>
     
 </head>
 <body>
-
-    <div class="informations-container active">
-        <!-- <a href="https://github.com/greenmagenta/autosculptor" target="_blank" class="informations-banner">Download Autosculptor add-on for Blender <span class="icon icon-chevron-right"></span></a> -->
-    </div>
 
     <div class="properties-container">
         <button id="download-button">
@@ -44,7 +39,7 @@
 
     <div class="viewer-container">
         <div class="viewer-preview"></div>
-        <model-viewer class="viewer-content" alt="" src="" shadow-intensity="1" camera-controls touch-action="pan-y" interaction-prompt="none" auto-rotate camera-orbit="9.698deg 72.69deg 8m" max-camera-orbit="0 0 8m" min-camera-orbit="0 0 5m"></model-viewer>
+        <model-viewer class="viewer-content" alt="" src="" shadow-intensity="1" tone-mapping="neutral" camera-controls touch-action="pan-y" interaction-prompt="none" auto-rotate camera-orbit="9.698deg 72.69deg 8m" max-camera-orbit="0 0 8m" min-camera-orbit="0 0 5m"></model-viewer>
     </div>
 
     <div class="loader-container active static">
@@ -185,7 +180,7 @@
     <div id="toast-container"></div>
 
 </body>
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js"></script>
     <script type="module" src="js/api.js"></script>
     <script type="module" src="js/script.js"></script>
     <script src="js/utils.js"></script>

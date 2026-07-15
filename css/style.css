@@ -1001,13 +1001,11 @@ Informations/Properties
     pointer-events: all;
 }
 
-.properties-container.active,
-.informations-container.active {
+.properties-container.active {
     display: flex;
 }
 
-.properties-container,
-.informations-container {
+.properties-container {
     position: fixed;
     padding: 16px;
     width: 100%;
@@ -1019,10 +1017,6 @@ Informations/Properties
     pointer-events: none;
     transition: opacity 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
     gap: 8px;
-}
-
-.informations-container {
-    flex-direction: column;
 }
 
 .properties-container {
@@ -1371,10 +1365,6 @@ Responsive
 
     .form-side .form-group:has(input[type="checkbox"]) {
         margin-top: 16px;
-    }
-
-    .informations-container.active {
-        display: none;
     }
 
     [data-tooltip] {

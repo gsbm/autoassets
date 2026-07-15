@@ -76,6 +76,53 @@ const spaces = {
         type: "mesh_builder",
         steps: 1
     }
+};
+
+
+/****************************************************************************************
+Shared helpers
+****************************************************************************************/
+function resolveMediaUrl(value) {
+    if (!value) {
+        return null;
+    }
+    if (typeof value === "string" && value.startsWith("http")) {
+        return value;
+    }
+    if (typeof value === "object" && value.url) {
+        return value.url;
+    }
+    if (typeof value === "string") {
+        const match = value.match(/href=["'](https?:\/\/[^"']+)["']/);
+        return match ? match[1] : null;
+    }
+    return null;
+}
+
+async function connectSpace(model, api_key) {
+    return Client.connect(spaces[model].api, {
+        token: api_key || undefined,
+        events: ["status", "data"]
+    });
+}
+
+async function runSubmission(submission, { step = 1, maxStep = 1, extractResult }) {
+    for await (const message of submission) {
+        if (message.type === "status") {
+            streamStatus(message, step, maxStep);
+        }
+        if (message.type === "data") {
+            return extractResult ? extractResult(message) : message;
+        }
+    }
+}
+
+async function fetchBlob(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch resource: ${url}`);
+    }
+    return response.blob();
 }
 
 
@@ -88,11 +135,21 @@ function streamStatus(status, step = 1, max_step = 1) {
         error: "✖",
     };
 
-    console.log(`Job status ${step}/${max_step}: ${status.endpoint} > ${status.stage} ${icons[status.stage] || ""}${status.eta ? ` (eta ${status.eta})` : ""}`);
-    addFormEvent(`Job status ${step}/${max_step}: ${status.endpoint} > ${status.stage} ${icons[status.stage] || ""}${status.eta ? ` (eta ${status.eta})` : ""}`);
+    const endpoint = status.endpoint ?? "job";
+    const stage = status.stage ?? status.status ?? "pending";
+    const eta = status.eta ? ` (eta ${status.eta})` : "";
+    const label = `Job status ${step}/${max_step}: ${endpoint} > ${stage} ${icons[stage] || ""}${eta}`;
 
-    if (status.stage === "error") {
-        throw new Error(status.message);
+    console.log(label);
+    addFormEvent(label);
+
+    if (stage === "error") {
+        const message = typeof status.message === "string"
+            ? status.message
+            : Array.isArray(status.message)
+                ? status.message.map((entry) => entry.msg ?? entry.message ?? entry).join(", ")
+                : "Generation failed";
+        throw new Error(message);
     }
 }
 
@@ -101,19 +158,18 @@ function streamStatus(status, step = 1, max_step = 1) {
 Get space runtime
 ****************************************************************************************/
 async function getSpaceRuntime(space_id) {
-    const payload = {
-        additionalFields: ['runtime'],
-        search: {
-            query: space_id,
-        }
-    };
+    const [owner, name] = space_id.split("/");
 
-    const space_iterator = listSpaces(payload);
-    for await (const space of space_iterator) {
+    for await (const space of listSpaces({
+        additionalFields: ["runtime"],
+        search: { owner, query: name }
+    })) {
         if (space.name === space_id) {
-            return JSON.parse(JSON.stringify(space.runtime, null, 2));
+            return space.runtime ?? null;
         }
     }
+
+    return null;
 }
 
 
@@ -121,21 +177,19 @@ async function getSpaceRuntime(space_id) {
 Get spaces availability
 ****************************************************************************************/
 export async function getSpacesAvailability() {
-    let spaces_availability = [];
-    for (const space_id of Object.values(spaces)) {
-        let runtime = await getSpaceRuntime(space_id.api);
-        let stage = runtime == null ? "ERROR" : runtime.stage;
-
-        spaces_availability.push({
-            label: space_id.label,
-            api: space_id.api,
-            url: space_id.url,
-            type: space_id.type,
-            key: Object.keys(spaces).find(key => spaces[key] === space_id),
-            runtime: stage
-        });
-    }
-    return spaces_availability;
+    return Promise.all(
+        Object.entries(spaces).map(async ([key, space]) => {
+            const runtime = await getSpaceRuntime(space.api);
+            return {
+                label: space.label,
+                api: space.api,
+                url: space.url,
+                type: space.type,
+                key,
+                runtime: runtime == null ? "ERROR" : runtime.stage
+            };
+        })
+    );
 }
 
 
@@ -157,208 +211,118 @@ export async function generateImage(
     apply_refiner,
     model
 ) {
-    // Connect to space
-    const client = await Client.connect(spaces[model].api, {
-        hf_token: api_key,
-        events: ["status", "data"]
-    });
+    const client = await connectSpace(model, api_key);
 
     console.log("Running:", spaces[model].api);
     addFormEvent(`Running: ${spaces[model].api}`);
 
     if (model === "sdxl") {
-        /******************************************
-        Job: sdxl
-        ******************************************/
-        // Generate image
-        const generation_job = client.submit("/predict", {
-            prompt: prompt,
-            negative_prompt: negative_prompt,
+        return runSubmission(client.submit("/predict", {
+            prompt,
+            negative_prompt,
             prompt_2: "",
             negative_prompt_2: "",
-            use_negative_prompt: use_negative_prompt,
+            use_negative_prompt,
             use_prompt_2: false,
             use_negative_prompt_2: false,
-            seed: seed,
-            width: width,
-            height: height,
-            guidance_scale_base: guidance_scale_base,
-            guidance_scale_refiner: guidance_scale_refiner,
-            num_inference_steps_base: num_inference_steps_base,
-            num_inference_steps_refiner: num_inference_steps_refiner,
-            apply_refiner: apply_refiner,
+            seed,
+            width,
+            height,
+            guidance_scale_base,
+            guidance_scale_refiner,
+            num_inference_steps_base,
+            num_inference_steps_refiner,
+            apply_refiner,
+        }), {
+            extractResult: (message) => resolveMediaUrl(message.data[0])
         });
-        for await (const message of generation_job) {
-            if (message.type === "status") {
-                streamStatus(message);
-    
-            }
-            if (message.type === "data") {
-                const {
-                    data: [result]
-                } = message;
-            
-                return result.url;
-            }
-        }
-    } else if (model === "sd3m") {
-        /******************************************
-        Job: sd3m
-        ******************************************/
-        // Generate image
-        const generation_job = client.submit("/infer", {
-            prompt: prompt,
-            negative_prompt: negative_prompt,
-            seed: seed,
+    }
+
+    if (model === "sd3m") {
+        return runSubmission(client.submit("/infer", {
+            prompt,
+            negative_prompt,
+            seed,
             randomize_seed: false,
-            width: width,
-            height: height,
+            width,
+            height,
             guidance_scale: guidance_scale_base,
             num_inference_steps: num_inference_steps_base,
+        }), {
+            extractResult: (message) => resolveMediaUrl(message.data[0])
         });
-        for await (const message of generation_job) {
-            if (message.type === "status") {
-                streamStatus(message);
-    
-            }
-            if (message.type === "data") {
-                const {
-                    data: [result]
-                } = message;
-            
-                return result.url;
-            }
-        }
-    } else if (model === "flux1") {
-        /******************************************
-        Job: flux1
-        ******************************************/
-        // Generate image
-        const generation_job = client.submit("/infer", {
-            prompt: prompt,
-            seed: seed,
+    }
+
+    if (model === "flux1") {
+        return runSubmission(client.submit("/infer", {
+            prompt,
+            seed,
             randomize_seed: false,
-            width: width,
-            height: height,
+            width,
+            height,
             num_inference_steps: num_inference_steps_base,
+        }), {
+            extractResult: (message) => resolveMediaUrl(message.data[0])
         });
-        for await (const message of generation_job) {
-            if (message.type === "status") {
-                streamStatus(message);
-            }
-            if (message.type === "data") {
-                const {
-                    data: [result]
-                } = message;
-            
-                return result.url;
-            }
-        }
-    } else if (model === "flux2") {
-        /******************************************
-        Job: flux2 (FLUX.2 Klein 9B)
-        ******************************************/
-        const generation_job = client.submit("/generate", {
-            prompt: prompt,
+    }
+
+    if (model === "flux2") {
+        return runSubmission(client.submit("/generate", {
+            prompt,
             input_images: [],
             mode_choice: "Distilled (4 steps)",
-            seed: seed,
+            seed,
             randomize_seed: false,
-            width: width,
-            height: height,
+            width,
+            height,
             num_inference_steps: 4,
             guidance_scale: 1,
             prompt_upsampling: false,
+        }), {
+            extractResult: (message) => resolveMediaUrl(message.data[0])
         });
-        for await (const message of generation_job) {
-            if (message.type === "status") {
-                streamStatus(message);
-            }
-            if (message.type === "data") {
-                const [imageResult] = message.data;
-                return imageResult?.url ?? imageResult;
-            }
-        }
-    } else if (model === "qwen") {
-        /******************************************
-        Job: qwen
-        ******************************************/
-        // Generate image
-        const generation_job = client.submit("/infer", {
-            prompt: prompt,
-            seed: seed,
+    }
+
+    if (model === "qwen") {
+        return runSubmission(client.submit("/infer", {
+            prompt,
+            seed,
             randomize_seed: false,
             aspect_ratio: "1:1",
             guidance_scale: guidance_scale_base,
             num_inference_steps: num_inference_steps_base,
             prompt_enhance: true
+        }), {
+            extractResult: (message) => resolveMediaUrl(message.data[0])
         });
-        for await (const message of generation_job) {
-            if (message.type === "status") {
-                streamStatus(message);
-            }
-            if (message.type === "data") {
-                const {
-                    data: [result]
-                } = message;
-            
-                return result.url;
-            }
-        }
-    } else if (model === "chroma") {
-        /******************************************
-        Job: chroma
-        ******************************************/
-        // Generate image
-        const generation_job = client.submit("/generate_image", {
-            prompt: prompt,
-            negative_prompt: negative_prompt,
-            width: width,
-            height: height,
+    }
+
+    if (model === "chroma") {
+        return runSubmission(client.submit("/generate_image", {
+            prompt,
+            negative_prompt,
+            width,
+            height,
             steps: num_inference_steps_base,
             cfg: guidance_scale_base,
-            seed: seed
+            seed
+        }), {
+            extractResult: (message) => resolveMediaUrl(message.data[0])
         });
-        for await (const message of generation_job) {
-            if (message.type === "status") {
-                streamStatus(message);
-            }
-            if (message.type === "data") {
-                const {
-                    data: [result]
-                } = message;
-            
-                return result.url;
-            }
-        }
-    } else if (model === "blip3o") {
-        /******************************************
-        Job: blip3o
-        ******************************************/
-        // Generate image
-        const generation_job = client.submit("/run_generate_image_tab", {
-            prompt: prompt,
-            seed: seed,
+    }
+
+    if (model === "blip3o") {
+        return runSubmission(client.submit("/run_generate_image_tab", {
+            prompt,
+            seed,
             guidance: guidance_scale_base,
             num_images: 1,
+        }), {
+            extractResult: (message) => message.data[0].value[0].image.url
         });
-        for await (const message of generation_job) {
-            if (message.type === "status") {
-                streamStatus(message);
-            }
-            if (message.type === "data") {
-                const {
-                    data: [result]
-                } = message;
-
-                console.log(result)
-            
-                return result.value[0].image.url;
-            }
-        }
-    } else {
-        throw new Error("Unknown or unsupported model");
     }
+
+    throw new Error("Unknown or unsupported model");
 }
 
 
@@ -375,183 +339,102 @@ export async function generateMesh(
     num_inference_steps_base,
     size
 ) {
-    // Connect to space
-    const client = await Client.connect(spaces[model].api, {
-        hf_token: api_key,
-        events: ["status", "data"]
-    });
+    const client = await connectSpace(model, api_key);
 
     console.log("Running:", spaces[model].api);
     addFormEvent(`Running: ${spaces[model].api}`);
 
-    // Fetch image
-    const image = await fetch(image_url);
-    if (!image.ok) {
-        throw new Error("Failed to fetch the reference image");
-    }
-
-    // Convert image to blob
-    const image_blob = await image.blob();
+    const image_blob = await fetchBlob(image_url);
 
     if (model === "instantmesh") {
-        /******************************************
-        Job: instantmesh
-        ******************************************/
-        // Preprocess image
-        const preprocess_job = client.submit("/preprocess", [
-            handle_file(image_blob),
-            true
-        ]);
-        for await (const message of preprocess_job) {
-            if (message.type === "status") {
-                streamStatus(message, 1, spaces[model].steps);
-            }
-            if (message.type === "data") {
-                var result_processed_image = message;
-            }
-        }
+        const preprocess_result = await runSubmission(
+            client.submit("/preprocess", [handle_file(image_blob), true]),
+            { step: 1, maxStep: spaces[model].steps }
+        );
 
-        // Fetch processed image
-        const processed_image = await fetch(result_processed_image.data[0].url);
-        if (!processed_image.ok) {
-            throw new Error("Failed to fetch the processed image");
-        }
+        const processed_image_blob = await fetchBlob(preprocess_result.data[0].url);
 
-        // Convert processed image to blob
-        const processed_image_blob = await processed_image.blob();
+        await runSubmission(
+            client.submit("/generate_mvs", [
+                handle_file(processed_image_blob),
+                sample_steps,
+                seed,
+            ]),
+            { step: 2, maxStep: spaces[model].steps }
+        );
 
-        // Generate MVS
-        const generation_job = client.submit("/generate_mvs", [
-            handle_file(processed_image_blob),
-            sample_steps,
-            seed,
-        ]);
-        for await (const message of generation_job) {
-            if (message.type === "status") {
-                streamStatus(message, 2, spaces[model].steps);
-            }
-        }
-
-        // Extrude mesh
-        const extrusion_job = client.submit("/make3d", []);
-        for await (const message of extrusion_job) {
-            if (message.type === "status") {
-                streamStatus(message, 3, spaces[model].steps);
-            }
-            if (message.type === "data") {
-                return message.data[1].url;
-            }
-        }
-    } else if (model === "trellis") {
-        /******************************************
-        Job: trellis
-        ******************************************/
-        // Preprocess image
-        const preprocess_job = client.submit("/preprocess_image", [
-            handle_file(image_blob)
-        ]);
-        let result_processed_image;
-        for await (const message of preprocess_job) {
-            if (message.type === "status") {
-                streamStatus(message, 1, spaces[model].steps);
-            }
-            if (message.type === "data") {
-                result_processed_image = message;
-            }
-        }
-
-        // Fetch processed image
-        const processed_image = await fetch(result_processed_image.data[0].url);
-        if (!processed_image.ok) {
-            throw new Error("Failed to fetch the processed image");
-        }
-        const processed_image_blob = await processed_image.blob();
-
-        // Image to 3D
-        const image_to_3d_job = client.submit("/image_to_3d", {
-            image: handle_file(processed_image_blob),
-            seed: seed,
-            ss_guidance_strength: guidance_scale_base > 50 ? 50 : guidance_scale_base,
-            ss_sampling_steps: sample_steps > 10 ? 10 : sample_steps,
-            slat_guidance_strength: guidance_scale_base > 50 ? 50 : guidance_scale_base,
-            slat_sampling_steps: num_inference_steps_base > 10 ? 10 : num_inference_steps_base
+        return runSubmission(client.submit("/make3d", []), {
+            step: 3,
+            maxStep: spaces[model].steps,
+            extractResult: (message) => resolveMediaUrl(message.data[1])
         });
-        let result_3d;
-        for await (const message of image_to_3d_job) {
-            if (message.type === "status") {
-                streamStatus(message, 2, spaces[model].steps);
-            }
-            if (message.type === "data") {
-                result_3d = message;
-            }
-        }
+    }
 
-        // Fetch state path
-        const state_file = await fetch(result_3d.data[0].url);
-        if (!state_file.ok) {
-            throw new Error("Failed to fetch the 3D model state file");
-        }
-        const state_file_blob = await state_file.blob();
+    if (model === "trellis") {
+        const preprocess_result = await runSubmission(
+            client.submit("/preprocess_image", [handle_file(image_blob)]),
+            { step: 1, maxStep: spaces[model].steps }
+        );
 
-        // Extract GLB
-        const extract_glb_job = client.submit("/extract_glb", { 
-            state_path: state_file_blob,
-            mesh_simplify: 0.95,
-            texture_size: size,
-        });
-        for await (const message of extract_glb_job) {
-            if (message.type === "status") {
-                streamStatus(message, 3, spaces[model].steps);
+        const processed_image_blob = await fetchBlob(preprocess_result.data[0].url);
+
+        const result_3d = await runSubmission(
+            client.submit("/image_to_3d", {
+                image: handle_file(processed_image_blob),
+                seed,
+                ss_guidance_strength: guidance_scale_base > 50 ? 50 : guidance_scale_base,
+                ss_sampling_steps: sample_steps > 10 ? 10 : sample_steps,
+                slat_guidance_strength: guidance_scale_base > 50 ? 50 : guidance_scale_base,
+                slat_sampling_steps: num_inference_steps_base > 10 ? 10 : num_inference_steps_base
+            }),
+            { step: 2, maxStep: spaces[model].steps }
+        );
+
+        const state_file_blob = await fetchBlob(result_3d.data[0].url);
+
+        return runSubmission(
+            client.submit("/extract_glb", {
+                state_path: handle_file(state_file_blob),
+                mesh_simplify: 0.95,
+                texture_size: size,
+            }),
+            {
+                step: 3,
+                maxStep: spaces[model].steps,
+                extractResult: (message) => resolveMediaUrl(message.data[0])
             }
-            if (message.type === "data") {
-                return message.data[0].url;
-            }
-        }
-    } else if (model === "trellis2") {
-        /******************************************
-        Job: trellis2 (microsoft/TRELLIS.2)
-        ******************************************/
+        );
+    }
+
+    if (model === "trellis2") {
         const resolution = size >= 1536 ? "1536" : size >= 1024 ? "1024" : "512";
-        const generation_job = client.submit("/image_to_3d", {
-            image: handle_file(image_blob),
-            seed: seed,
-            resolution: resolution,
-            ss_guidance_strength: 7.5,
-            ss_guidance_rescale: 0.7,
-            ss_sampling_steps: 12,
-            ss_rescale_t: 5,
-            shape_slat_guidance_strength: 7.5,
-            shape_slat_guidance_rescale: 0.5,
-            shape_slat_sampling_steps: 12,
-            shape_slat_rescale_t: 3,
-            tex_slat_guidance_strength: 1,
-            tex_slat_guidance_rescale: 0,
-            tex_slat_sampling_steps: 12,
-            tex_slat_rescale_t: 3,
-        });
-        let result_3d;
-        for await (const message of generation_job) {
-            if (message.type === "status") {
-                streamStatus(message, 1, spaces[model].steps);
-            }
-            if (message.type === "data") {
-                result_3d = message;
-            }
-        }
-        const raw = result_3d.data[0];
-        const meshUrl = typeof raw === "object" && raw?.url
-            ? raw.url
-            : typeof raw === "string" && raw.startsWith("http")
-                ? raw
-                : (() => {
-                    const match = typeof raw === "string" && raw.match(/href=["'](https?:\/\/[^"']+\.glb)["']/);
-                    return match ? match[1] : raw;
-                })();
-        if (!meshUrl || typeof meshUrl !== "string" || !meshUrl.startsWith("http")) {
+        const result_3d = await runSubmission(
+            client.submit("/image_to_3d", {
+                image: handle_file(image_blob),
+                seed,
+                resolution,
+                ss_guidance_strength: 7.5,
+                ss_guidance_rescale: 0.7,
+                ss_sampling_steps: 12,
+                ss_rescale_t: 5,
+                shape_slat_guidance_strength: 7.5,
+                shape_slat_guidance_rescale: 0.5,
+                shape_slat_sampling_steps: 12,
+                shape_slat_rescale_t: 3,
+                tex_slat_guidance_strength: 1,
+                tex_slat_guidance_rescale: 0,
+                tex_slat_sampling_steps: 12,
+                tex_slat_rescale_t: 3,
+            }),
+            { step: 1, maxStep: spaces[model].steps }
+        );
+
+        const meshUrl = resolveMediaUrl(result_3d.data[0]);
+        if (!meshUrl) {
             throw new Error("TRELLIS.2 did not return a mesh URL");
         }
         return meshUrl;
-    } else {
-        throw new Error("Unknown or unsupported model");
     }
+
+    throw new Error("Unknown or unsupported model");
 }
