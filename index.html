@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Autoassets • Generate quickly 3D models from a simple textual or visual description</title>
 
     <link rel="icon" href="assets/img/icon.svg">
 
     <meta name="google-site-verification" content="n5yJLSJB-XuNZS0Agbs5fyaK5gcqXLpBukled2hyIko" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://ajax.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss: blob:; worker-src blob:;">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/lucide.css">
-
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/style.css">
 
@@ -21,20 +21,22 @@
     <script type="importmap">
         {
             "imports": {
-                "@gradio/client":  "https://cdn.jsdelivr.net/npm/@gradio/client@2.3.1/+esm",
+                "@gradio/client": "https://cdn.jsdelivr.net/npm/@gradio/client@2.3.1/+esm",
                 "@huggingface/hub": "https://cdn.jsdelivr.net/npm/@huggingface/hub@2.13.3/+esm"
             }
         }
     </script>
-    
 </head>
 <body>
 
-    <div class="properties-container">
-        <button id="download-button">
-            <span>Download (0.00 MB)</span>
-            <span class="icon icon-download"></span>
-        </button>
+    <div class="top-actions">
+        <button type="button" id="cancel-button" class="secondary-button" hidden>Cancel</button>
+        <div class="properties-container">
+            <button type="button" id="download-button">
+                <span>Download (0.00 MB)</span>
+                <span class="icon icon-download"></span>
+            </button>
+        </div>
     </div>
 
     <div class="viewer-container">
@@ -53,32 +55,22 @@
                 <div class="cube-face-f"></div>
             </div>
         </div>
-        <span class="loader-label">Write down a prompt to begin</span>
+        <span class="loader-label" aria-live="polite">Write down a prompt to begin</span>
     </div>
-    
 
-    <div class="status-container" style="display: none;">
-        <div class="status-content"></div>
-        <div class="status-label">
-            <span id="status-amount">0/0</span>
-            <span class="status-description">Operational Services</span>
-            <span class="icon icon-circle-dot"></span>
-        </div>
-    </div>
-    
     <div class="form-container">
-        <div class="form-type-container">
-            <div class="type-item active" id="type-text">Text<span class="icon-text-cursor-input"></span></div>
-            <div class="type-item" id="type-image">Image<span class="icon-image"></span></div>
+        <div class="form-type-container" role="tablist" aria-label="Input type">
+            <button type="button" class="type-item active" id="type-text" role="tab" aria-selected="true">Text<span class="icon-text-cursor-input"></span></button>
+            <button type="button" class="type-item" id="type-image" role="tab" aria-selected="false">Image<span class="icon-image"></span></button>
         </div>
-        <div class="form-event-container">
+        <div class="form-event-container" aria-live="polite">
             <div class="form-event-wrapper"></div>
         </div>
         <form id="form-data">
             <div class="main-form">
                 <div class="main-form-group">
                     <input class="form-input form-type-text" type="text" id="prompt-text" name="prompt" placeholder="Describe the 3D model you want to generate" required>
-                    <button type="button" class="form-input secondary form-type-text" id="preset-button"><span class="icon-shuffle"></span></button>
+                    <button type="button" class="form-input secondary form-type-text" id="preset-button" aria-label="Random preset"><span class="icon-shuffle"></span></button>
                     <input accept="image/png, image/jpeg" class="form-input form-type-image type-disabled" type="file" id="prompt_image" name="prompt_image">
                     <label tabindex="0" class="form-input form-type-image type-disabled" for="prompt_image">
                         <span class="input-file-label">Import or drag-and-drop an image<span class="icon-upload"></span></span>
@@ -87,26 +79,26 @@
                     </label>
                 </div>
                 <button type="submit" id="generate-button" disabled>
-                    <span>Generate 3D Model</span>
+                    <span>Checking services…</span>
                     <span class="icon icon-sparkles"></span>
                 </button>
             </div>
-            <div class="form-settings-label" tabindex="0">
+            <button type="button" class="form-settings-label" aria-expanded="false" aria-controls="form-settings">
                 <span>Advanced</span>
                 <div class="icon">
                     <span class="icon-chevron-down"></span>
                 </div>
-            </div>
-            <div class="form-settings-container">                
+            </button>
+            <div class="form-settings-container" id="form-settings">
                 <span class="banner-wrapper --warning"><span class="icon icon-triangle-alert"></span>Some parameters may not be available on all models</span>
                 <div class="form-side">
                     <div class="form-group">
                         <label for="image_sampler">Image Sampler</label>
-                        <select type="text" id="image_sampler" name="image_sampler" required></select>
+                        <select id="image_sampler" name="image_sampler" required></select>
                     </div>
                     <div class="form-group">
                         <label for="mesh_builder">Mesh Builder</label>
-                        <select type="text" id="mesh_builder" name="mesh_builder" required></select>
+                        <select id="mesh_builder" name="mesh_builder" required></select>
                     </div>
                 </div>
                 <div class="form-group">
@@ -119,7 +111,7 @@
                 </div>
                 <div class="form-group">
                     <label for="sample_steps">Sample Steps</label>
-                    <input type="number" pattern="[0-9]*" id="sample_steps" name="sample_steps" value="75" min="30" max="75">
+                    <input type="number" id="sample_steps" name="sample_steps" value="75" min="30" max="75">
                 </div>
                 <div class="form-side">
                     <div class="form-group">
@@ -128,27 +120,27 @@
                     </div>
                     <div class="form-group">
                         <label for="seed">Seed</label>
-                        <input type="number" pattern="[0-9]*" id="seed" name="seed" value="0" min="0" max="1000000" disabled>
+                        <input type="number" id="seed" name="seed" value="0" min="0" max="1000000" disabled>
                     </div>
                 </div>
                 <div class="form-side">
                     <div class="form-group">
                         <label for="width">Width</label>
-                        <input type="number" pattern="[0-9]*" id="width" name="width" value="1024" min="256" max="1024">
+                        <input type="number" id="width" name="width" value="1024" min="256" max="1024">
                     </div>
                     <div class="form-group">
                         <label for="height">Height</label>
-                        <input type="number" pattern="[0-9]*" id="height" name="height" value="1024" min="256" max="1024">
+                        <input type="number" id="height" name="height" value="1024" min="256" max="1024">
                     </div>
                 </div>
                 <div class="form-side">
                     <div class="form-group">
                         <label for="guidance_scale_base">Guidance Scale</label>
-                        <input type="number" pattern="[0-9]*" id="guidance_scale_base" name="guidance_scale_base" value="5" min="1" max="20">
+                        <input type="number" id="guidance_scale_base" name="guidance_scale_base" value="5" min="1" max="20">
                     </div>
                     <div class="form-group">
                         <label for="num_inference_steps_base">Number of Inference Steps</label>
-                        <input type="number" pattern="[0-9]*" id="num_inference_steps_base" name="num_inference_steps_base" value="25" min="10" max="100">
+                        <input type="number" id="num_inference_steps_base" name="num_inference_steps_base" value="25" min="10" max="100">
                     </div>
                 </div>
                 <div class="form-side">
@@ -158,31 +150,26 @@
                     </div>
                     <div class="form-group">
                         <label for="guidance_scale_refiner">Guidance Scale (Refiner)</label>
-                        <input type="number" pattern="[0-9]*" id="guidance_scale_refiner" name="guidance_scale_refiner" value="5" min="1" max="20" disabled>
+                        <input type="number" id="guidance_scale_refiner" name="guidance_scale_refiner" value="5" min="1" max="20" disabled>
                     </div>
                     <div class="form-group">
                         <label for="num_inference_steps_refiner">Number of Inference Steps (Refiner)</label>
-                        <input type="number" pattern="[0-9]*" id="num_inference_steps_refiner" name="num_inference_steps_refiner" value="25" min="10" max="100" disabled>
+                        <input type="number" id="num_inference_steps_refiner" name="num_inference_steps_refiner" value="25" min="10" max="100" disabled>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="hf_api_key">Hugging Face Access Token<span data-tooltip="Add your Access Token with writing permission to get more GPU requests."><span class="icon icon-circle-help"></span></span></label>
-                    <input type="text" id="hf_api_key" name="hf_api_key" placeholder="hf...">
+                    <label for="hf_api_key">Hugging Face Access Token<span data-tooltip="Add your Access Token with write permission to get more GPU requests."><span class="icon icon-circle-help"></span></span></label>
+                    <input type="password" id="hf_api_key" name="hf_api_key" placeholder="hf..." autocomplete="off">
                 </div>
             </div>
         </form>
         <div class="footer-container">
             <span>By using Autoassets, you agree <a href="legal.html">Terms of Service</a></span>
-            <a href="https://github.com/gsbm/autoassets" target="_blank"><span class="icon icon-github"></span> GitHub</a>
+            <a href="https://github.com/gsbm/autoassets" target="_blank" rel="noopener noreferrer"><span class="icon icon-github"></span> GitHub</a>
         </div>
     </div>
 
-    <div id="toast-container"></div>
-
-</body>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.3.1/model-viewer.min.js"></script>
-    <script type="module" src="js/api.js"></script>
-    <script type="module" src="js/script.js"></script>
-    <script src="js/utils.js"></script>
-
+    <script type="module" src="js/main.js"></script>
+</body>
 </html>
